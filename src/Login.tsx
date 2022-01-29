@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Col, Container, Row, Form, Button } from 'react-bootstrap';
+import { Col, Container, Row, Form, Button,ToastContainer,Toast } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useSelector, connect } from 'react-redux';
 import $ from 'jquery';
@@ -10,6 +10,7 @@ import { setLoading, setAuthenticated, setUser } from './state/actions/authActio
 import NavbarComponent from './components/NavbarComponent';
 import SpinnerComponent from  './components/SpinnerComponent';
 import FooterComponent from './components/FooterComponent';
+import ToastComponent from './components/ToastComponent';
 
 export const Login = ({ ...props }: any) => {
 
@@ -17,14 +18,18 @@ export const Login = ({ ...props }: any) => {
     const [password, setpassword] = useState("");
     const [rememberme, setRememberme] = useState(true);
     const [loaded, setLoaded] = useState(false);
+    const [usernameValid, setusernameValid] = useState(false);
+    const [passwordValid, setpasswordValid] = useState(false);
+    const [toastShow, settoastShow] = useState(false);
+    const [toastMessage, settoastMessage] = useState("");
 
+    const passwordSpan = useRef<HTMLSpanElement>(null);
+    const usernameInput = useRef<HTMLInputElement>(null);
+    const passwordInput = useRef<HTMLInputElement>(null);
     const auth = useSelector((state: StateType) => state.auth);
     console.log(auth);
 
-    const passwordSpan = useRef<HTMLSpanElement>(null);
-
     useEffect(() => {
-        console.log('useEffect');
         if (!loaded)
             setLoaded(true);
     }, []);
@@ -47,7 +52,77 @@ export const Login = ({ ...props }: any) => {
 
     const onSubmitFormClick = (e: any) => {
         e.preventDefault();
+        if((username === "" || !usernameValid) && usernameInput.current){
+            usernameInput.current.focus();
+            settoastMessage("Please Enter the valid username.");
+            settoastShow(true);
+        }
+            
+        else if((password === "" || !passwordValid) && passwordInput.current){
+            passwordInput.current.focus();
+            settoastMessage("Please Enter the valid password.");
+            settoastShow(true);
+        }
+            
         console.log("Submit", username, password, rememberme);
+    }
+    
+    const onChangeUsername = (value:string) =>{
+        if(usernameInput.current === null)
+            return;
+
+        let $this = $(usernameInput.current);
+
+        const userNameRegex = new RegExp("^[a-zA-Z0-9.!@_]{6,30}$");
+        let usernameValid = userNameRegex.test(value);
+        
+
+        if(value === ""){
+            $this.removeClass("invalid");
+            $this.removeClass("valid");
+        }
+        else if(!usernameValid){
+            $this.addClass("invalid");
+            $this.removeClass("valid");
+        }
+        else if(usernameValid){
+            $this.addClass("valid");
+            $this.removeClass("invalid");
+        }
+
+        setusername(value);
+        setusernameValid(usernameValid);
+    }
+
+    const onChangePassword = (value:string) => {
+        if(passwordInput.current === null)
+            return;
+
+        const passwordRegex = new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+        const passwordValid = passwordRegex.test(value);    
+        let $this = $(passwordInput.current);
+
+        if(value === ""){
+            $this.removeClass("invalid");
+            $this.removeClass("valid");
+        }
+        else if(!passwordValid){
+            $this.addClass("invalid");
+            $this.removeClass("valid");
+        }
+        else if(passwordValid){
+            $this.addClass("valid");
+            $this.removeClass("invalid");
+        }
+
+        setpassword(value);
+        setpasswordValid(passwordValid);
+    }
+
+    const toastCallback:Function = () => {
+        console.log("callback",toastShow);
+        if(toastShow)
+            settoastShow(false);
     }
 
     return (!loaded ?
@@ -57,6 +132,8 @@ export const Login = ({ ...props }: any) => {
         </>
         :
         <>
+            <ToastComponent type={"Danger"} position={"top-end"} text={toastMessage} 
+            show={toastShow} header={"Brand"} iconClass={"fa-solid fa-circle"} delay={5000} autohide={true} close={()=> toastCallback()}/>
             <NavbarComponent />
             <section className="ftco-section text-black">
                 <Container>
@@ -71,10 +148,12 @@ export const Login = ({ ...props }: any) => {
                                 <h3 className="mb-4 text-center">Have an account?</h3>
                                 <Form className="signin-form">
                                     <Form.Group className="form-group" controlId="formUsername">
-                                        <Form.Control type="text" onChange={(e) => setusername(e.target.value)} placeholder="Username" required />
+                                        <Form.Control ref={usernameInput} type="text" onChange={(e) => onChangeUsername(e.target.value)} placeholder="Username" required />
+                                        <span className="fa fa-fw fa-solid valid-icon"></span>
                                     </Form.Group>
                                     <Form.Group className="form-group d-md-flex" controlId="formPassword">
-                                        <Form.Control type="password" onChange={(e) => setpassword(e.target.value)} placeholder="Password" required />
+                                        <Form.Control ref={passwordInput} type="password" onChange={(e) => onChangePassword(e.target.value)} placeholder="Password" required />
+                                        <span className="fa fa-fw fa-solid valid-icon"></span>
                                         <span ref={passwordSpan} onClick={() => onTogglePasswordClick()} data-toggle="#formPassword" className="fa fa-fw fa-eye field-icon toggle-password"></span>
                                     </Form.Group>
                                     <Form.Group className="form-group">

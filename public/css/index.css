@@ -549,11 +549,45 @@ a:hover {
     border: 1px solid #b3b3b3;
     background: rgba(255, 255, 255, 0.08);
     border-radius: 40px;
-    padding-left: 20px;
+    padding-left: 40px;
     padding-right: 20px;
     -webkit-transition: 0.3s;
     -o-transition: 0.3s;
     transition: 0.3s;
+}
+
+.form-control.invalid {
+    border-color: var(--app-grifindor-red)!important;
+}
+
+.form-control.valid {
+    border-color: green!important;
+}
+
+.form-control+.valid-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    color: var(--bs-gray-900);
+}
+
+.form-control.valid+.valid-icon::before {
+    content: "\f00c";
+}
+
+.form-control.invalid+.valid-icon::before {
+    content: "\f057";
+}
+
+.form-control.invalid+.valid-icon {
+    color: var(--app-grifindor-red)!important;
+}
+
+.form-control.valid+.valid-icon {
+    color: green!important;
 }
 
 @media (prefers-reduced-motion: reduce) {
