@@ -1,13 +1,41 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+import { BrowserRouter, useRoutes } from 'react-router-dom';
+import { Provider } from 'react-redux';
+
 import reportWebVitals from './reportWebVitals';
 
+import store from './state/store';
+import routes from './routes';
+import ThemeContext from './contexts/ThemeContext';
+
+
+const Routes = () => { return useRoutes(routes) };
+
+const ReactApp: React.FC = (): JSX.Element => {
+
+  let theme = localStorage.getItem("theme");
+  
+  if(!theme){
+    localStorage.setItem("theme","light"); 
+    theme = "light";
+  };
+
+  return (
+    <React.StrictMode>
+      <Provider store={store}>
+        <BrowserRouter>
+          <ThemeContext.Provider value={theme}>
+            {<Routes />}
+          </ThemeContext.Provider>
+        </BrowserRouter>
+      </Provider>
+    </React.StrictMode>
+  );
+};
+
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <ReactApp />,
   document.getElementById('root')
 );
 
