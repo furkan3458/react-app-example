@@ -1,18 +1,45 @@
-import { RouteObject } from 'react-router-dom';
+import React from 'react';
+import { RouteObject, useRoutes } from 'react-router-dom';
 
 import Home from './Home';
 import Login from './Login';
 
+interface RouteProps {
+    auth: "guest" | "user" | string;
+}
 
-const routes:RouteObject[] = [
-    {
-        path: "/",
-        element: <Home />,
-    },
-    {
-        path:"/login",
-        element:<Login />
-    }
-]
+const Routes = (props: RouteProps) => {
 
-export default routes;
+    const guestRoutes: RouteObject[] = [
+        {
+            path: "/",
+            element: <Home />,
+        },
+        {
+            path: "/login",
+            element: <Login />
+        }
+    ];
+
+    const userRoutes: RouteObject[] = [
+        {
+            path: "/",
+            element: <Home />,
+        }
+    ];
+
+    const defaultRoutes: RouteObject[] = props.auth === "guest" ? guestRoutes : userRoutes;
+
+    defaultRoutes.push(
+        {
+            path: "*",
+            element: <Home />,
+        }
+    );
+    const routes = useRoutes(defaultRoutes);
+    return (
+        <>{routes}</>
+    );
+}
+
+export default Routes;

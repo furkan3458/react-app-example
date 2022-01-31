@@ -1,6 +1,8 @@
 enum ActionTypes {
     AUTH_LOADING = "AUTH_LOADING",
     AUTH_AUTHENTICATION = "AUTH_AUTHENTICATION",
+    AUTH_VALIDATE = "AUTH_VALIDATE",
     AUTH_SET_USER = "AUTH_SET_USER",
+    AUTH_FAIL = "AUTH_FAIL",
 };
 export default ActionTypes;

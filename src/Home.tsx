@@ -6,7 +6,6 @@ import SpinnerComponent from  './components/SpinnerComponent';
 import FooterComponent from './components/FooterComponent';
 
 const Home = ({...props}: any) => {
-    console.log(props);
     const [loaded, setLoaded] = useState(false);
     
     useEffect(() => {

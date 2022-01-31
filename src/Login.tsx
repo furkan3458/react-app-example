@@ -1,16 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Col, Container, Row, Form, Button,ToastContainer,Toast } from 'react-bootstrap';
+import { Col, Container, Row, Form, Button, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useSelector, connect } from 'react-redux';
 import $ from 'jquery';
 
 import { StateType } from './state/reducers';
-import { setLoading, setAuthenticated, setUser } from './state/actions/authActions';
+import { setLoading, setAuthFail, setAuthenticated, loadUser } from './state/actions/authActions';
 
 import NavbarComponent from './components/NavbarComponent';
-import SpinnerComponent from  './components/SpinnerComponent';
+import SpinnerComponent from './components/SpinnerComponent';
 import FooterComponent from './components/FooterComponent';
 import ToastComponent from './components/ToastComponent';
+import AlertComponent from './components/AlertComponent';
 
 export const Login = ({ ...props }: any) => {
 
@@ -26,13 +27,24 @@ export const Login = ({ ...props }: any) => {
     const passwordSpan = useRef<HTMLSpanElement>(null);
     const usernameInput = useRef<HTMLInputElement>(null);
     const passwordInput = useRef<HTMLInputElement>(null);
+    const submitButton = useRef<HTMLButtonElement>(null);
+
     const auth = useSelector((state: StateType) => state.auth);
     console.log(auth);
 
     useEffect(() => {
         if (!loaded)
             setLoaded(true);
-    }, []);
+    }, [loaded]);
+
+    useEffect(() => {
+        handleSubmitAccess();
+    }, [auth.isLoading]);
+
+    useEffect(() => {
+        if(auth.isAuthenticated)
+            window.location.href="/";
+    }, [auth.isAuthenticated]);
 
     const onTogglePasswordClick = () => {
         if (passwordSpan.current === null)
@@ -43,7 +55,7 @@ export const Login = ({ ...props }: any) => {
         $this.toggleClass("fa-eye fa-eye-slash");
 
         var input = $($this.data("toggle"));
-        if (input.attr("type") == "password") {
+        if (input.attr("type") === "password") {
             input.attr("type", "text");
         } else {
             input.attr("type", "password");
@@ -52,40 +64,49 @@ export const Login = ({ ...props }: any) => {
 
     const onSubmitFormClick = (e: any) => {
         e.preventDefault();
-        if((username === "" || !usernameValid) && usernameInput.current){
+        if (auth.isLoading) {
+            settoastMessage("Please wait...");
+            settoastShow(true);
+            return;
+        }
+
+        if ((username === "" || !usernameValid) && usernameInput.current) {
             usernameInput.current.focus();
             settoastMessage("Please Enter the valid username.");
             settoastShow(true);
+            return;
         }
-            
-        else if((password === "" || !passwordValid) && passwordInput.current){
+
+        else if ((password === "" || !passwordValid) && passwordInput.current) {
             passwordInput.current.focus();
             settoastMessage("Please Enter the valid password.");
             settoastShow(true);
+            return;
         }
-            
+
         console.log("Submit", username, password, rememberme);
+        props.loadUser({ username: username, password: password, rememberMe:rememberme });
     }
-    
-    const onChangeUsername = (value:string) =>{
-        if(usernameInput.current === null)
+
+    const onChangeUsername = (value: string) => {
+        if (usernameInput.current === null)
             return;
 
         let $this = $(usernameInput.current);
 
         const userNameRegex = new RegExp("^[a-zA-Z0-9.!@_]{6,30}$");
         let usernameValid = userNameRegex.test(value);
-        
 
-        if(value === ""){
+
+        if (value === "") {
             $this.removeClass("invalid");
             $this.removeClass("valid");
         }
-        else if(!usernameValid){
+        else if (!usernameValid) {
             $this.addClass("invalid");
             $this.removeClass("valid");
         }
-        else if(usernameValid){
+        else if (usernameValid) {
             $this.addClass("valid");
             $this.removeClass("invalid");
         }
@@ -94,23 +115,23 @@ export const Login = ({ ...props }: any) => {
         setusernameValid(usernameValid);
     }
 
-    const onChangePassword = (value:string) => {
-        if(passwordInput.current === null)
+    const onChangePassword = (value: string) => {
+        if (passwordInput.current === null)
             return;
 
         const passwordRegex = new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
-        const passwordValid = passwordRegex.test(value);    
+        const passwordValid = passwordRegex.test(value);
         let $this = $(passwordInput.current);
 
-        if(value === ""){
+        if (value === "") {
             $this.removeClass("invalid");
             $this.removeClass("valid");
         }
-        else if(!passwordValid){
+        else if (!passwordValid) {
             $this.addClass("invalid");
             $this.removeClass("valid");
         }
-        else if(passwordValid){
+        else if (passwordValid) {
             $this.addClass("valid");
             $this.removeClass("invalid");
         }
@@ -119,21 +140,31 @@ export const Login = ({ ...props }: any) => {
         setpasswordValid(passwordValid);
     }
 
-    const toastCallback:Function = () => {
-        console.log("callback",toastShow);
-        if(toastShow)
+    const toastCallback: Function = () => {
+        if (toastShow)
             settoastShow(false);
     }
 
+    const handleSubmitAccess = () => {
+        if (submitButton.current === null)
+            return;
+
+        $(submitButton.current).prop("disabled", auth.isLoading);
+    }
+
+    const handleAlertClose = () =>{
+        props.setAuthFail(false);
+    }
+    
     return (!loaded ?
         <>
             <NavbarComponent />
-            <SpinnerComponent/>
+            <SpinnerComponent />
         </>
         :
         <>
-            <ToastComponent type={"Danger"} position={"top-end"} text={toastMessage} 
-            show={toastShow} header={"Brand"} iconClass={"fa-solid fa-circle"} delay={5000} autohide={true} close={()=> toastCallback()}/>
+            <ToastComponent type={"Danger"} position={"top-end"} text={toastMessage}
+                show={toastShow} header={"Brand"} iconClass={"fa-solid fa-circle"} delay={5000} autohide={true} close={() => toastCallback()} />
             <NavbarComponent />
             <section className="ftco-section text-black">
                 <Container>
@@ -146,6 +177,7 @@ export const Login = ({ ...props }: any) => {
                         <Col md={'6'} lg={'4'}>
                             <div className="login-wrap p-0">
                                 <h3 className="mb-4 text-center">Have an account?</h3>
+                                <AlertComponent show={auth.isAuthFail} variant={'danger'} header={"Login Failed"} text={"You may entered wrong username or password. Try again."} onClose={()=> handleAlertClose()}/>
                                 <Form className="signin-form">
                                     <Form.Group className="form-group" controlId="formUsername">
                                         <Form.Control ref={usernameInput} type="text" onChange={(e) => onChangeUsername(e.target.value)} placeholder="Username" required />
@@ -157,7 +189,9 @@ export const Login = ({ ...props }: any) => {
                                         <span ref={passwordSpan} onClick={() => onTogglePasswordClick()} data-toggle="#formPassword" className="fa fa-fw fa-eye field-icon toggle-password"></span>
                                     </Form.Group>
                                     <Form.Group className="form-group">
-                                        <Button type="submit" onClick={(e) => onSubmitFormClick(e)} className="btn-submit px-3">Login</Button>
+                                        <Button ref={submitButton} type="submit" onClick={(e) => onSubmitFormClick(e)} className="btn-submit px-3">
+                                            {auth.isLoading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : <>Login</>}
+                                        </Button>
                                     </Form.Group>
                                     <Form.Group className="form-group d-md-flex">
                                         <div className="w-50">
@@ -181,10 +215,10 @@ export const Login = ({ ...props }: any) => {
                     </Row>
                 </Container>
             </section>
-            <FooterComponent/>
+            <FooterComponent />
         </>
     );
 };
 
-const mapDispatchToProps = { setLoading, setAuthenticated, setUser };
+const mapDispatchToProps = { setLoading, setAuthFail, setAuthenticated, loadUser };
 export default connect(null, mapDispatchToProps)(Login);

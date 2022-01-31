@@ -1,7 +1,7 @@
 import React from 'react';
 import { Row, Col, Container } from 'react-bootstrap';
 
-function SpinnerComponent() {
+const SpinnerComponent = () =>{
     return (
         <Container>
             <Row className="min-vh-100">
