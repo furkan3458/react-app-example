@@ -62,10 +62,21 @@
     border-radius: 2px;
 }
 
+.loader.animation-7 {
+    width: 16vmax;
+    height: 16vmax;
+}
+
+.loader.animation-7 .shape {
+    width: 6vmax;
+    height: 6vmax;
+    margin: 1vmax 1vmax;
+}
+
 .loader .shape {
     position: absolute;
-    width: 10px;
-    height: 10px;
+    width: 60px;
+    height: 60px;
     border-radius: 5px;
 }
 
@@ -749,6 +760,36 @@
     }
     75% {
         transform: translate(-18px, 0);
+    }
+}
+
+.animation-7 .shape1,
+.animation-7 .shape2,
+.animation-7 .shape3,
+.animation-7 .shape4 {
+    -webkit-animation: float 1s infinite ease-in-out alternate;
+    animation: float 1s infinite ease-in-out alternate;
+}
+
+.animation-7 .shape1 {
+    animation-delay: .2s;
+}
+
+.animation-7 .shape2 {
+    animation-delay: .4s;
+}
+
+.animation-7 .shape3 {
+    animation-delay: .6s;
+}
+
+.animation-7 .shape4 {
+    animation-delay: .8s;
+}
+
+@keyframes float {
+    100% {
+        transform: translateY(20px);
     }
 }
 

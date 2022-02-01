@@ -482,7 +482,7 @@ a:hover {
 }
 
 .ftco-section {
-    padding: 7em 0;
+    padding: 4em 0;
 }
 
 .ftco-no-pt {
@@ -658,6 +658,19 @@ textarea.form-control {
     height: 50px;
 }
 
+.btn-live-blue {
+    color: #fff;
+    background-color: var(--app-live-blue);
+    border-color: var(--app-live-blue);
+    font-size: 1.2vmax;
+}
+
+.btn-live-blue:hover {
+    color: black!important;
+    background-color: #0d7df5;
+    border-color: #0d7df5;
+}
+
 
 /* Hide the browser's default checkbox */
 
@@ -781,4 +794,15 @@ textarea.form-control {
     font-size: 13px;
     color: var(--app-gray-900);
     margin-bottom: 0;
+}
+
+
+/*Error Page*/
+
+.message-box {
+    color: var(--app-gray-900);
+    font-family: 'Quicksand';
+    font-weight: 500;
+    font-size: 3vmax!important;
+    padding: 0 2vmax;
 }

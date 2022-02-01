@@ -3,6 +3,7 @@ import { RouteObject, useRoutes } from 'react-router-dom';
 
 import Home from './Home';
 import Login from './Login';
+import Error from './Error';
 
 interface RouteProps {
     auth: "guest" | "user" | string;
@@ -33,7 +34,7 @@ const Routes = (props: RouteProps) => {
     defaultRoutes.push(
         {
             path: "*",
-            element: <Home />,
+            element: <Error />,
         }
     );
     const routes = useRoutes(defaultRoutes);
