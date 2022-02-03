@@ -3,12 +3,12 @@ import { Dispatch } from 'redux';
 
 import Action from '../../utils/action';
 import ActionTypes from '../../utils/types';
-
+import {authValidity, ValidityStates} from '../reducers/authReducer';
 const axios = Axios.create({
     baseURL:"https://spring-sampleapp.herokuapp.com",
 });
 
-export const setLoading = (state:boolean) => (dispatch:Dispatch<Action>) => {
+export const setAuthLoading = (state:boolean) => (dispatch:Dispatch<Action>) => {
     return dispatch({type:ActionTypes.AUTH_LOADING, payload:state});
 }
 
@@ -22,6 +22,10 @@ export const setAuthFail = (state:boolean) => (dispatch:Dispatch<Action>) => {
 
 export const setUser = (user:any) => (dispatch:Dispatch<Action>) => {
     dispatch({type:ActionTypes.AUTH_SET_USER, payload:user});
+}
+
+export const validateAuthUsername = (state:authValidity) => (dispatch:Dispatch<Action>) => {
+    dispatch({type:ActionTypes.AUTH_VALIDATE_USERNAME, payload:state});
 }
 
 export const loadUser = (user:any) => (dispatch:Dispatch<Action>) => {
@@ -79,6 +83,25 @@ export const validateUser = () => (dispatch:Dispatch<Action>) => {
     else{
         dispatch({type:ActionTypes.AUTH_VALIDATE, payload:null});
     }
+}
+
+export const signupAuthAction = () => (dispatch:Dispatch<Action>) =>{
+    
+}
+
+export const validateUsernameAuthAction = (username:string) => (dispatch:Dispatch<Action>) =>{
+    dispatch({type:ActionTypes.AUTH_VALIDATE_USERNAME, payload:{isValidating:true, validateState:ValidityStates.IDLE}});
+    axios.post("/api/auth/checkusername",username).then(response=>{
+        const data = response.data;
+        if(data.result)
+            dispatch({type:ActionTypes.AUTH_VALIDATE_USERNAME, payload:{isValidating:true,validateState:ValidityStates.VALID}});
+        else
+        dispatch({type:ActionTypes.AUTH_VALIDATE_USERNAME, payload:{isValidating:true,validateState:ValidityStates.INVALID}});
+
+    }).catch(error=>{
+        console.log(error);
+        dispatch({type:ActionTypes.AUTH_VALIDATE_USERNAME, payload:{isValidating:false,validateState:ValidityStates.IDLE}});
+    });
 }
 
 const clearStorage = () =>{

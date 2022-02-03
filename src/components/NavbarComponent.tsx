@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import $ from 'jquery';
@@ -20,12 +20,15 @@ const NavbarComponent = () => {
     const toggleMenu = useRef<HTMLAnchorElement>(null);
     const navClone = useRef<HTMLUListElement>(null);
 
-    const [cloneLoaded, setcloneLoaded] = useState(false);
-
     useEffect(() => {
         siteMenuClone();
     }, []);
 
+    useEffect(() => {
+        return () => {
+            closeCanvas();
+        }
+    }, []);
 
     const ListElementLink = (params: customLinkType): JSX.Element => {
         let location = useLocation();
@@ -58,58 +61,32 @@ const NavbarComponent = () => {
         $('body').toggleClass('offcanvas-menu');
     }
 
+    const arrowCollapseClick = (e: any) => {
+        let $this = $(e.target);
+        let target = $this.data('target');
+
+        $this.toggleClass('active');
+        $this.toggleClass('collapsed');
+
+        new Collapse(target, { toggle: true, parent: $this })
+
+        e.preventDefault();
+    }
+
     const siteMenuClone = () => {
-        if (navClone.current === null || cloneLoaded)
-            return;
-
-        let $this = $(navClone.current);
-        let counter = 0;
-
-        $('.site-mobile-menu-body').empty();
-        $this.clone().attr('class', 'site-nav-wrap').appendTo('.site-mobile-menu-body');
-
-
-        $('.site-mobile-menu .has-children').each(function () {
-            let $this = $(this);
-
-            $this.prepend('<span class="arrow-collapse collapsed">');
-
-            $this.find('.arrow-collapse').attr({
-                'data-toggle': 'collapse',
-                'data-target': '#collapseItem' + counter,
-            });
-
-            $this.find('> ul').attr({
-                'class': 'collapse',
-                'id': 'collapseItem' + counter,
-            });
-
-            counter++;
-
-        });
-
-        $('body').on('click', '.arrow-collapse', function (e: any) {
-            let $this = $(this);
-            let target = $this.data('target');
-
-            $this.toggleClass('active');
-            $this.toggleClass('collapsed');
-
-            new Collapse(target, { toggle: true, parent: $this })
-
-            e.preventDefault();
-        });
-
         $(document).on("mouseup", function (e: any) {
             var container = $(".site-mobile-menu");
             if (!container.is(e.target) && container.has(e.target).length === 0) {
-                if ($('body').hasClass('offcanvas-menu')) {
-                    $('body').removeClass('offcanvas-menu');
-                }
+                closeCanvas();
             }
         });
-        setcloneLoaded(true);
     };
+
+    const closeCanvas = () => {
+        if ($('body').hasClass('offcanvas-menu')) {
+            $('body').removeClass('offcanvas-menu');
+        }
+    }
 
     return (
         <ThemeContext.Consumer>{value => (
@@ -118,10 +95,55 @@ const NavbarComponent = () => {
                     <div className="site-mobile-menu">
                         <div className="site-mobile-menu-header">
                             <div className="site-mobile-menu-close mt-3">
-                                <span className="icon-close2 js-menu-toggle"></span>
+                                <span className="fa-solid fa-xmark js-menu-toggle"></span>
                             </div>
                         </div>
-                        <div className="site-mobile-menu-body"></div>
+                        <div className="site-mobile-menu-body">
+                            <ul className="site-nav-wrap">
+                                <ListElementLink key={"1"} to={"/"} header={"Home"} />
+                                <DropdownLink key={"6"} to={"/dropdown"} header={"Dropdown"} clsName={"has-children"}>
+                                    <span onClick={(e) => arrowCollapseClick(e)} className="arrow-collapse collapsed" data-toggle="collapse" data-target="#collapseItem0"></span>
+                                    <ul className="collapse" id="collapseItem0">
+                                        <ListElementLink key={"2"} to={"/menu_1"} header={"Menu-1"} />
+                                        <ListElementLink key={"3"} to={"/menu_2"} header={"Menu-2"} />
+                                        <ListElementLink key={"4"} to={"/menu_3"} header={"Menu-3"} />
+                                        <DropdownLink key={"6"} to={"/menu_4"} header={"Menu-4"} clsName={"has-children"}>
+                                            <span onClick={(e) => arrowCollapseClick(e)} className="arrow-collapse collapsed" data-toggle="collapse" data-target="#collapseItem1"></span>
+                                            <ul className="collapse" id="collapseItem1">
+                                                <ListElementLink key={"7"} to={"/menu_5"} header={"Menu-1"} />
+                                                <ListElementLink key={"8"} to={"/menu_6"} header={"Menu-2"} />
+                                                <ListElementLink key={"9"} to={"/menu_7"} header={"Menu-3"} />
+                                                <ListElementLink key={"10"} to={"/menu_8"} header={"Menu-4"} />
+                                            </ul>
+                                        </DropdownLink>
+                                    </ul>
+                                </DropdownLink>
+                                <ListElementLink key={"11"} to={"/listings"} header={"Listings"} />
+                                <ListElementLink key={"12"} to={"/about"} header={"About"} />
+                                <ListElementLink key={"13"} to={"/blog"} header={"Blog"} />
+                                <ListElementLink key={"14"} to={"/contact"} header={"Contact"} />
+                            </ul>
+                        </div>
+                        <>
+                            {auth.authType === "guest" ?
+                                <div className="d-flex site-mobile-menu-footer border-top">
+                                    <Link to="/login" className="text-black mx-2">Login</Link>
+                                    <Link to="/signup" className="text-black mx-2">Signup</Link>
+                                </div>
+                                :
+                                <div>
+                                    <ul className="site-nav-wrap border-top">
+                                        <li className="has-children">
+                                            <div>{auth.authenticatedUser.fullname}</div>
+                                            <span onClick={(e) => arrowCollapseClick(e)} className="arrow-collapse" data-toggle="collapse" data-target="#collapseItem3"></span>
+                                            <ul className="collapse" id="collapseItem3">
+                                                <ListElementLink key={"8"} to={"/logout"} header={"Logout"} />
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            }
+                        </>
                     </div>
                     <Container fluid={true}>
                         <Row className='align-items-center'>
@@ -162,7 +184,18 @@ const NavbarComponent = () => {
                                         <div className="mx-1"><Link to="/login" className="text-black">Login</Link></div>
                                         <div className="mx-1"><Link to="/signup" className="text-black">Signup</Link></div>
                                     </> :
-                                    <div>{auth.authenticatedUser.fullname}</div>
+                                    <nav className="site-navigation position-relative text-center">
+                                        <ul className="site-menu me-auto d-none d-lg-block">
+                                            <li className="has-children">
+                                                <span>{auth.authenticatedUser.fullname}</span>
+                                                <ul className="dropdown arrow-top">
+                                                    <ListElementLink key={"2"} to={"/menu_1"} header={"Menu-1"} />
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </nav>
+
+
                                 }
                             </Col>
                             <Col className="d-inline-block d-xl-none ms-md-0 me-auto py-3 text-end" xs={'9'} style={{ position: "relative", top: 3 + "px" }}>

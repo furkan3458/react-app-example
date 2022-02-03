@@ -3,6 +3,7 @@ import { RouteObject, useRoutes } from 'react-router-dom';
 
 import Home from './Home';
 import Login from './Login';
+import Signup from './Signup';
 import Error from './Error';
 
 interface RouteProps {
@@ -19,6 +20,10 @@ const Routes = (props: RouteProps) => {
         {
             path: "/login",
             element: <Login />
+        },
+        {
+            path: "/signup",
+            element: <Signup />
         }
     ];
 

@@ -1,9 +1,13 @@
 import React, { useState,useEffect } from 'react';
-import { Container, Button } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
+
+import { StateType } from './state/reducers';
 
 import NavbarComponent from './components/NavbarComponent';
 import SpinnerComponent from  './components/SpinnerComponent';
 import FooterComponent from './components/FooterComponent';
+
 
 const Home = ({...props}: any) => {
     const [loaded, setLoaded] = useState(false);
@@ -13,9 +17,7 @@ const Home = ({...props}: any) => {
             setLoaded(true);
     }, []);
     
-    const useHandleClick = () => {
-        console.log("button click");
-    }
+    const auth = useSelector((state: StateType) => state.auth);
 
     return (
         !loaded ? 

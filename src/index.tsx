@@ -9,7 +9,7 @@ import store from './state/store';
 import Routes from './routes';
 
 import { StateType } from './state/reducers';
-import { setLoading, setAuthFail, setAuthenticated, validateUser } from './state/actions/authActions';
+import { setAuthLoading, setAuthFail, setAuthenticated, validateUser } from './state/actions/authActions';
 
 import ThemeContext from './contexts/ThemeContext';
 import AuthContext, { AuthContextProvider } from './contexts/AuthContext';
@@ -89,7 +89,7 @@ const ReactApp: React.FC = ({ ...props }: any): JSX.Element => {
   );
 };
 
-const mapDispatchToProps = { setLoading, setAuthFail, setAuthenticated, validateUser };
+const mapDispatchToProps = { setAuthLoading, setAuthFail, setAuthenticated, validateUser };
 const ConectedReactApp = connect(null, mapDispatchToProps)(ReactApp);
 
 const App = () => {
@@ -110,4 +110,4 @@ ReactDOM.render(
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+reportWebVitals(console.log);
