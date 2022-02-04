@@ -6,5 +6,6 @@ enum ActionTypes {
     AUTH_VALIDATE_USERNAME = "AUTH_VALIDATE_USERNAME",
     AUTH_VALIDATE_EMAIL = "AUTH_VALIDATE_EMAIL",
     AUTH_FAIL = "AUTH_FAIL",
+    AUTH_LOGOUT = "AUTH_LOGOUT",
 };
 export default ActionTypes;

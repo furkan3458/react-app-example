@@ -179,11 +179,11 @@ export const Login = ({ ...props }: any) => {
                                 <AlertComponent show={auth.isAuthFail} variant={'danger'} header={"Login Failed"} text={"You may entered wrong username or password. Try again."} onClose={()=> handleAlertClose()}/>
                                 <Form className="signin-form">
                                     <Form.Group className="form-group" controlId="formUsername">
-                                        <Form.Control ref={usernameInput} type="text" onChange={(e) => onChangeUsername(e.target.value)} placeholder="Username" required />
+                                        <Form.Control ref={usernameInput} type="text" onKeyUp={(e) => onChangeUsername(e.currentTarget.value)} placeholder="Username" required />
                                         <span className="fa fa-fw fa-solid valid-icon"></span>
                                     </Form.Group>
                                     <Form.Group className="form-group d-md-flex" controlId="formPassword">
-                                        <Form.Control ref={passwordInput} type="password" onChange={(e) => onChangePassword(e.target.value)} placeholder="Password" required />
+                                        <Form.Control ref={passwordInput} type="password" onKeyUp={(e) => onChangePassword(e.currentTarget.value)} placeholder="Password" required />
                                         <span className="fa fa-fw fa-solid valid-icon"></span>
                                         <span ref={passwordSpan} onClick={() => onTogglePasswordClick()} data-toggle="#formPassword" className="fa fa-fw fa-eye field-icon toggle-password"></span>
                                     </Form.Group>

@@ -1,21 +1,26 @@
 import React, { useRef, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Link, NavLink, useLocation } from 'react-router-dom';
+import { connect } from 'react-redux';
 import $ from 'jquery';
 import { Collapse } from 'bootstrap';
+
+import { logoutAction } from '../state/actions/authActions';
 
 import ThemeContext from '../contexts/ThemeContext';
 import AuthContext from '../contexts/AuthContext';
 
 interface customLinkType {
-    to: string,
+    to?: string,
     header: string,
     clsName?: string | '',
     span?: boolean | true,
-    children?: React.ReactNode
+    children?: React.ReactNode,
+    as?:"button" | "link",
+    func?:Function
 }
 
-const NavbarComponent = () => {
+const NavbarComponent = ({ ...props }:any) => {
 
     const toggleMenu = useRef<HTMLAnchorElement>(null);
     const navClone = useRef<HTMLUListElement>(null);
@@ -35,17 +40,29 @@ const NavbarComponent = () => {
         const isSpan = params.span === undefined ? true : params.span;
         const clsName = params.clsName === undefined ? "" : params.clsName;
 
-        return (<li className={clsName + (location.pathname === params.to ? " active" : "")}><NavLink to={params.to}>{isSpan ? <span>{params.header}</span> : params.header}</NavLink></li>)
+        let child = <NavLink to={params.to!}>{isSpan ? <span>{params.header}</span> : params.header}</NavLink>;
+        if(params.as && params.as === "button")
+            child = <a onClick={()=>params.func!()}>{isSpan ? <span>{params.header}</span> : params.header}</a>;
+
+        return (
+            <li className={clsName + (location.pathname === params.to ? " active" : "")}>
+                {child}
+            </li>
+        );
     }
 
     const DropdownLink: React.FC<customLinkType> = (params: customLinkType) => {
         let location = useLocation();
         const isSpan = params.span === undefined ? true : params.span;
         const clsName = params.clsName === undefined ? "" : params.clsName;
+        let child = <NavLink to={params.to!}>{isSpan ? <span>{params.header}</span> : params.header}</NavLink>;
+
+        if(params.as && params.as === "button")
+            child = <a onClick={()=>params.func!()}>{isSpan ? <span>{params.header}</span> : params.header}</a>;
 
         return (
             <li className={clsName + (location.pathname === params.to ? " active" : "")}>
-                <NavLink to={params.to}>{isSpan ? <span>{params.header}</span> : params.header}</NavLink>
+                {child}
                 {params.children}
             </li>
         );
@@ -88,6 +105,12 @@ const NavbarComponent = () => {
         }
     }
 
+    const onLogout = () =>{
+        console.log("onLogout");
+        const jwtToken = localStorage.getItem("jwtKey");
+        props.logoutAction({token:jwtToken});
+    }
+
     return (
         <ThemeContext.Consumer>{value => (
             <AuthContext.Consumer>{auth => (
@@ -95,7 +118,7 @@ const NavbarComponent = () => {
                     <div className="site-mobile-menu">
                         <div className="site-mobile-menu-header">
                             <div className="site-mobile-menu-close mt-3">
-                                <span className="fa-solid fa-xmark js-menu-toggle"></span>
+                                <span onClick={()=> closeCanvas()} className="fa-solid fa-xmark js-menu-toggle"></span>
                             </div>
                         </div>
                         <div className="site-mobile-menu-body">
@@ -137,7 +160,7 @@ const NavbarComponent = () => {
                                             <div>{auth.authenticatedUser.fullname}</div>
                                             <span onClick={(e) => arrowCollapseClick(e)} className="arrow-collapse" data-toggle="collapse" data-target="#collapseItem3"></span>
                                             <ul className="collapse" id="collapseItem3">
-                                                <ListElementLink key={"8"} to={"/logout"} header={"Logout"} />
+                                                <ListElementLink key={"8"} as="button" header={"Logout"} func={()=>onLogout()}/>
                                             </ul>
                                         </li>
                                     </ul>
@@ -189,7 +212,7 @@ const NavbarComponent = () => {
                                             <li className="has-children">
                                                 <span>{auth.authenticatedUser.fullname}</span>
                                                 <ul className="dropdown arrow-top">
-                                                    <ListElementLink key={"2"} to={"/menu_1"} header={"Menu-1"} />
+                                                    <ListElementLink key={"8"} as="button" header={"Logout"} func={()=>onLogout()}/>
                                                 </ul>
                                             </li>
                                         </ul>
@@ -213,4 +236,8 @@ const NavbarComponent = () => {
     );
 }
 
-export default NavbarComponent;
+const mapStateToProps = (state: any) => ({});
+
+const mapDispatchToProps = {logoutAction};
+
+export default connect(mapStateToProps, mapDispatchToProps)(NavbarComponent);

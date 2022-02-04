@@ -78,6 +78,11 @@ const authReducer = (state: authState = initialize, action: action) => {
                 ...state,
                 emailValidity: action.payload,
             }
+        case ActionTypes.AUTH_LOGOUT:
+            return {
+                ...state,
+                isValidate: action.payload
+            }
         default:
             return state;
     }

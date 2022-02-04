@@ -3,7 +3,7 @@ import { Dispatch } from 'redux';
 
 import Action from '../../utils/action';
 import ActionTypes from '../../utils/types';
-import {authValidity, ValidityStates} from '../reducers/authReducer';
+import {ValidityStates} from '../reducers/authReducer';
 const axios = Axios.create({
     baseURL:"https://spring-sampleapp.herokuapp.com",
 });
@@ -24,8 +24,12 @@ export const setUser = (user:any) => (dispatch:Dispatch<Action>) => {
     dispatch({type:ActionTypes.AUTH_SET_USER, payload:user});
 }
 
-export const validateAuthUsername = (state:authValidity) => (dispatch:Dispatch<Action>) => {
-    dispatch({type:ActionTypes.AUTH_VALIDATE_USERNAME, payload:state});
+export const setDefaultValidateUsername = () => (dispatch:Dispatch<Action>) => {
+    dispatch({type:ActionTypes.AUTH_VALIDATE_USERNAME, payload:{isValidating:false, validateState:ValidityStates.IDLE}});
+}
+
+export const setDefaultValidateEmail = () => (dispatch:Dispatch<Action>) => {
+    dispatch({type:ActionTypes.AUTH_VALIDATE_EMAIL, payload:{isValidating:false, validateState:ValidityStates.IDLE}});
 }
 
 export const loadUser = (user:any) => (dispatch:Dispatch<Action>) => {
@@ -48,7 +52,7 @@ export const loadUser = (user:any) => (dispatch:Dispatch<Action>) => {
         } 
     })
     .catch(error=>{
-        console.log(error);
+        console.log(error.response);
         dispatch({type:ActionTypes.AUTH_LOADING, payload:false});
         dispatch({type:ActionTypes.AUTH_FAIL, payload:true});
     });
@@ -67,7 +71,7 @@ export const validateUser = () => (dispatch:Dispatch<Action>) => {
 
         axios.post("api/auth/validate",validate).then(response=>{
             const data = response.data;
-            if(data.validate){
+            if(data.result){
                 dispatch({type:ActionTypes.AUTH_VALIDATE, payload:user});
             }
             else{
@@ -75,7 +79,7 @@ export const validateUser = () => (dispatch:Dispatch<Action>) => {
                 dispatch({type:ActionTypes.AUTH_VALIDATE, payload:null});
             }
         }).catch(error=>{
-            console.log(error);
+            console.log(error.response);
             clearStorage();
             dispatch({type:ActionTypes.AUTH_VALIDATE, payload:null});
         });
@@ -85,22 +89,73 @@ export const validateUser = () => (dispatch:Dispatch<Action>) => {
     }
 }
 
-export const signupAuthAction = () => (dispatch:Dispatch<Action>) =>{
-    
+export const signupAuthAction = (form:any) => (dispatch:Dispatch<Action>) =>{
+    dispatch({type:ActionTypes.AUTH_LOADING, payload:true});
+    axios.post("api/auth/signup",form).then(response => {
+        const data:any = response.data;
+        console.log(data);
+        dispatch({type:ActionTypes.AUTH_LOADING, payload:false});
+        
+        if(data.result === undefined || data.error === null){
+
+            localStorage.setItem("remember-me",data.rememberMe);
+            localStorage.setItem("jwtKey",data.token);
+            localStorage.setItem("session",btoa(unescape(encodeURIComponent(JSON.stringify(data)))) );
+            
+            dispatch({type:ActionTypes.AUTH_SET_USER, payload:data});
+        }
+        else{
+            dispatch({type:ActionTypes.AUTH_FAIL, payload:true});
+        } 
+    })
+    .catch((error)=>{
+        console.log(error.response);
+        dispatch({type:ActionTypes.AUTH_LOADING, payload:false});
+        dispatch({type:ActionTypes.AUTH_FAIL, payload:true});
+    });
+}
+
+export const logoutAction = (user:any) => (dispatch:Dispatch<Action>) =>{
+    dispatch({type:ActionTypes.AUTH_LOGOUT, payload:false});
+    axios.post("/api/auth/logout",user).then(response=>{
+        dispatch({type:ActionTypes.AUTH_LOGOUT, payload:true});
+        clearStorage();
+        window.location.href="/";
+    }).catch(error=>{
+        console.log(error.response);
+        dispatch({type:ActionTypes.AUTH_LOGOUT, payload:true});
+        clearStorage();
+        window.location.href="/";
+    });
 }
 
 export const validateUsernameAuthAction = (username:string) => (dispatch:Dispatch<Action>) =>{
     dispatch({type:ActionTypes.AUTH_VALIDATE_USERNAME, payload:{isValidating:true, validateState:ValidityStates.IDLE}});
-    axios.post("/api/auth/checkusername",username).then(response=>{
+    axios.post("/api/auth/validate_username",{username:username}).then(response=>{
         const data = response.data;
         if(data.result)
-            dispatch({type:ActionTypes.AUTH_VALIDATE_USERNAME, payload:{isValidating:true,validateState:ValidityStates.VALID}});
+            dispatch({type:ActionTypes.AUTH_VALIDATE_USERNAME, payload:{isValidating:false,validateState:ValidityStates.VALID}});
         else
-        dispatch({type:ActionTypes.AUTH_VALIDATE_USERNAME, payload:{isValidating:true,validateState:ValidityStates.INVALID}});
+        dispatch({type:ActionTypes.AUTH_VALIDATE_USERNAME, payload:{isValidating:false,validateState:ValidityStates.INVALID}});
 
     }).catch(error=>{
-        console.log(error);
+        console.log(error.response);
         dispatch({type:ActionTypes.AUTH_VALIDATE_USERNAME, payload:{isValidating:false,validateState:ValidityStates.IDLE}});
+    });
+}
+
+export const validateEmailAuthAction = (email:string) => (dispatch:Dispatch<Action>) =>{
+    dispatch({type:ActionTypes.AUTH_VALIDATE_EMAIL, payload:{isValidating:true, validateState:ValidityStates.IDLE}});
+    axios.post("/api/auth/validate_email",{email:email}).then(response=>{
+        const data = response.data;
+        if(data.result)
+            dispatch({type:ActionTypes.AUTH_VALIDATE_EMAIL, payload:{isValidating:false,validateState:ValidityStates.VALID}});
+        else
+        dispatch({type:ActionTypes.AUTH_VALIDATE_EMAIL, payload:{isValidating:false,validateState:ValidityStates.INVALID}});
+
+    }).catch(error=>{
+        console.log(error.response);
+        dispatch({type:ActionTypes.AUTH_VALIDATE_EMAIL, payload:{isValidating:false,validateState:ValidityStates.IDLE}});
     });
 }
 

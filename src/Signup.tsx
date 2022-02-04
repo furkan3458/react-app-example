@@ -6,7 +6,7 @@ import $ from 'jquery';
 
 import { StateType } from './state/reducers';
 import { ValidityStates } from './state/reducers/authReducer';
-import { setAuthLoading, setAuthFail, validateAuthUsername, signupAuthAction, validateUsernameAuthAction } from './state/actions/authActions';
+import { setDefaultValidateUsername, setDefaultValidateEmail, setAuthFail, signupAuthAction, validateUsernameAuthAction, validateEmailAuthAction } from './state/actions/authActions';
 
 import NavbarComponent from './components/NavbarComponent';
 import SpinnerComponent from './components/SpinnerComponent';
@@ -53,26 +53,12 @@ export const Signup = ({ ...props }: any) => {
     }, [auth.isAuthenticated]);
 
     useEffect(() => {
-        if(usernameInput.current === null)
+        if(usernameInput.current === null || emailInput.current === null)
             return;
 
-        let $this = $(usernameInput.current);
-        switch(auth.usernameValidity.validateState){
-            case ValidityStates.IDLE:
-                $this.removeClass("invalid");
-                $this.removeClass("valid");
-                break;
-            case ValidityStates.VALID:
-                $this.removeClass("invalid");
-                $this.addClass("valid");
-                break;
-            case ValidityStates.INVALID:
-                $this.addClass("invalid");
-                $this.removeClass("valid");
-                break;
-
-        }
-    }, [auth.usernameValidity])
+        handleUsernameValidity();
+        handleEmailValidity();
+    }, [auth.usernameValidity, auth.emailValidity])
 
     const onTogglePasswordClick = () => {
         if (passwordSpan.current === null)
@@ -124,7 +110,7 @@ export const Signup = ({ ...props }: any) => {
         }
 
         console.log("Submit", username, password, email, fullname);
-        props.signupAction({ username: username, password: password, email: email, fullname: fullname });
+        props.signupAuthAction({ username: username, password: password, email: email, fullname: fullname });
     }
 
     const onChangeUsername = async (value: string) => {
@@ -139,12 +125,13 @@ export const Signup = ({ ...props }: any) => {
         if (value === "") {
             $this.removeClass("invalid");
             $this.removeClass("valid");
+            props.setDefaultValidateUsername();
         }
         else if (!usernameValid) {
             $this.addClass("invalid");
             $this.removeClass("valid");
         }
-        else if (usernameValid) {
+        else if (usernameValid && !auth.usernameValidity.isValidating) {
             $this.removeClass("invalid");
             $this.removeClass("valid");
             setTimeout(() => { checkUsername(value) }, 1 * 500);
@@ -183,21 +170,23 @@ export const Signup = ({ ...props }: any) => {
         if (emailInput.current === null)
             return;
 
-        const emailRegex = new RegExp("");
+        const emailRegex = new RegExp(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
         const emailValid = emailRegex.test(value);
         let $this = $(emailInput.current);
 
         if (value === "") {
             $this.removeClass("invalid");
             $this.removeClass("valid");
+            props.setDefaultValidateEmail();
         }
         else if (!emailValid) {
             $this.addClass("invalid");
             $this.removeClass("valid");
         }
-        else if (emailValid) {
-            $this.addClass("valid");
+        else if (emailValid && !auth.emailValidity.isValidating) {
             $this.removeClass("invalid");
+            $this.removeClass("valid");
+            setTimeout(() => { checkEmail(value) }, 1 * 500);
         }
 
         setemail(value);
@@ -229,15 +218,63 @@ export const Signup = ({ ...props }: any) => {
         setfullnameValid(fullnameInvalid);
     }
 
-    const checkUsername = (value: string) => {
+    const checkUsername = (value:string) => {
         if (usernameInput.current!.value === value) {
             props.validateUsernameAuthAction(value);
+        }
+    }
+
+    const checkEmail = (value:string) =>{
+        if (emailInput.current!.value === value) {
+            props.validateEmailAuthAction(value);
         }
     }
 
     const toastCallback: Function = () => {
         if (toastShow)
             settoastShow(false);
+    }
+
+    const handleUsernameValidity = () =>{
+        let $this = $(usernameInput.current!);
+        switch(auth.usernameValidity.validateState){
+            case ValidityStates.IDLE:
+                $this.removeClass("invalid");
+                $this.removeClass("valid");
+                setusernameValid(false);
+                break;
+            case ValidityStates.VALID:
+                $this.removeClass("invalid");
+                $this.addClass("valid");
+                setusernameValid(true);
+                break;
+            case ValidityStates.INVALID:
+                $this.addClass("invalid");
+                $this.removeClass("valid");
+                setusernameValid(false);
+                break;
+        }
+    }
+
+    const handleEmailValidity = () =>{
+        let $this = $(emailInput.current!);
+        switch(auth.emailValidity.validateState){
+            case ValidityStates.IDLE:
+                $this.removeClass("invalid");
+                $this.removeClass("valid");
+                setemailValid(false);
+                break;
+            case ValidityStates.VALID:
+                $this.removeClass("invalid");
+                $this.addClass("valid");
+                setemailValid(true);
+                break;
+            case ValidityStates.INVALID:
+                $this.addClass("invalid");
+                $this.removeClass("valid");
+                setemailValid(false);
+                break;
+        }
     }
 
     const handleSubmitAccess = () => {
@@ -275,7 +312,7 @@ export const Signup = ({ ...props }: any) => {
                                 <AlertComponent show={auth.isAuthFail} variant={'danger'} header={"Login Failed"} text={"You may entered wrong username or password. Try again."} onClose={() => handleAlertClose()} />
                                 <Form className="signin-form">
                                     <Form.Group className="form-group" controlId="formUsername">
-                                        <Form.Control ref={usernameInput} type="text" onChange={(e) => onChangeUsername(e.target.value)} placeholder="Username" required />
+                                        <Form.Control ref={usernameInput} type="text" onKeyUp={(e) => onChangeUsername(e.currentTarget.value)} placeholder="Username" required />
                                         {auth.usernameValidity.isValidating ? 
                                             <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" className="valid-icon"/>
                                             :   
@@ -283,15 +320,19 @@ export const Signup = ({ ...props }: any) => {
                                         }
                                     </Form.Group>
                                     <Form.Group className="form-group" controlId="forEmail">
-                                        <Form.Control ref={emailInput} type="email" onChange={(e) => onChangeEmail(e.target.value)} placeholder="Email" required />
-                                        <span className="fa fa-fw fa-solid valid-icon"></span>
+                                        <Form.Control ref={emailInput} type="email" onKeyUp={(e) => onChangeEmail(e.currentTarget.value)} placeholder="Email" required />
+                                        {auth.emailValidity.isValidating ? 
+                                            <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" className="valid-icon"/>
+                                            :   
+                                            <span className="fa fa-fw fa-solid valid-icon"></span>
+                                        }
                                     </Form.Group>
                                     <Form.Group className="form-group" controlId="formFullname">
-                                        <Form.Control ref={fullnameInput} type="text" onChange={(e) => onChangeFullname(e.target.value)} placeholder="Fullname" required />
+                                        <Form.Control ref={fullnameInput} type="text" onKeyUp={(e) => onChangeFullname(e.currentTarget.value)} placeholder="Fullname" required />
                                         <span className="fa fa-fw fa-solid valid-icon"></span>
                                     </Form.Group>
                                     <Form.Group className="form-group d-md-flex" controlId="formPassword">
-                                        <Form.Control ref={passwordInput} type="password" onChange={(e) => onChangePassword(e.target.value)} placeholder="Password" required />
+                                        <Form.Control ref={passwordInput} type="password" onKeyUp={(e) => onChangePassword(e.currentTarget.value)} placeholder="Password" required />
                                         <span className="fa fa-fw fa-solid valid-icon"></span>
                                         <span ref={passwordSpan} onClick={() => onTogglePasswordClick()} data-toggle="#formPassword" className="fa fa-fw fa-eye field-icon toggle-password"></span>
                                     </Form.Group>
@@ -318,6 +359,6 @@ export const Signup = ({ ...props }: any) => {
 
 const mapStateToProps = (state: any) => ({});
 
-const mapDispatchToProps = { signupAuthAction, validateUsernameAuthAction, validateAuthUsername };
+const mapDispatchToProps = {setDefaultValidateUsername, setDefaultValidateEmail, setAuthFail, signupAuthAction, validateUsernameAuthAction, validateEmailAuthAction };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Signup);

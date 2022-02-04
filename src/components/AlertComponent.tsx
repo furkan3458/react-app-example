@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {Alert} from 'react-bootstrap';
-import { propTypes } from 'react-bootstrap/esm/Image';
 
 interface AlertProps {
     header:string,
@@ -14,7 +13,7 @@ interface AlertProps {
 const AlertComponent = (props:AlertProps) => {
     
     const [show, setShow] = useState(props.show);
-    let isShow = props.show;
+    let isShow = show;
 
     const handleClose = () =>{
         console.log("Alert close");
