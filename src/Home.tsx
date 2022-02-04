@@ -1,12 +1,14 @@
 import React, { useState,useEffect } from 'react';
-import { Container } from 'react-bootstrap';
+import { Container,Row,Col } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
 import { StateType } from './state/reducers';
 
+import SliderComponent from './components/SliderComponent';
 import NavbarComponent from './components/NavbarComponent';
 import SpinnerComponent from  './components/SpinnerComponent';
 import FooterComponent from './components/FooterComponent';
+import CardComponent from './components/CardComponent';
 
 
 const Home = ({...props}: any) => {
@@ -18,9 +20,10 @@ const Home = ({...props}: any) => {
     }, []);
     
     const auth = useSelector((state: StateType) => state.auth);
+    const products = useSelector((state: StateType) => state.products);
 
     return (
-        !loaded ? 
+        (!loaded || products.isProductLoading) ? 
         <>
             <NavbarComponent />
             <SpinnerComponent/>
@@ -28,7 +31,17 @@ const Home = ({...props}: any) => {
         :
         <>
             <NavbarComponent />
-            <Container className="px-1">
+            <Container>
+                <Row>
+                    <Col>
+                        <SliderComponent />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <CardComponent />
+                    </Col>
+                </Row>
             </Container>
             <FooterComponent/>
         </>
