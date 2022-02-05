@@ -39,7 +39,7 @@ const Home = ({...props}: any) => {
                 </Row>
                 <Row>
                     <Col>
-                        <CardComponent />
+                        <CardComponent header={"Popular Products"} secondText={"Discount on new products to %20"}/>
                     </Col>
                 </Row>
             </Container>

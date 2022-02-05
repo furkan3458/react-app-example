@@ -26,6 +26,7 @@ interface bookDetailType{
     author:string,
     subject:string,
     publisher:string,
+    relaseDate:string,
 }
 
 const initialize = {

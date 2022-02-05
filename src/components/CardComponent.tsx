@@ -1,159 +1,86 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import { StateType } from '../state/reducers';
+import { Col, Container, Row, Modal } from 'react-bootstrap';
 
-interface CardPropType{
-    header:string,
+import CardCellComponent from './CardCellComponent';
+import CldImageComponent from './CldImageComponent';
+
+import ProductMenuContext,{ProductMenuContextProvider} from '../contexts/ProductMenuContext';
+
+interface CardPropType {
+    header: string,
+    secondText: string,
 }
 
-const CardComponent = (props:any) => {
+const CardComponent = (props: CardPropType) => {
+
+    const [isModalShow, setIsModalShow] = useState(false);
+    const [modalImage, setModalImage] = useState("");
+    const [productMenuContext, setProductMenuContext] = useState<ProductMenuContextProvider>();
 
     const products = useSelector((state: StateType) => state.products);
+
+    useEffect(() => {
+        initProductMenuContext();
+    }, []);
+
+    const initProductMenuContext = () =>{
+        let context:ProductMenuContextProvider = {
+            fullscreen : handleFullscreen,
+            addCart : handleAddCart,
+            addFavorites : handleAddFavorites
+        }
+
+        setProductMenuContext(context);
+    }
+    
+    const handleAddFavorites = (id:number) => {
+        console.log("handleAddFavorites --CardComponent",id);
+    }
+
+    const handleAddCart = (id:number) =>{
+        console.log("handleAddCart --CardComponent",id);
+    } 
+
+    const handleFullscreen = (id:number, image:string) =>{
+        console.log("handleFullscreen --CardComponent",id);
+        setModalImage(image);
+        setIsModalShow(true);
+    }
 
     return (
         <>
             <section className="section-products">
-                <div className="container">
-                    <div className="row justify-content-center text-center">
-                        <div className="col-md-8 col-lg-6">
+                <Container>
+                    <Row className="justify-content-center text-center">
+                        <Col md={8} lg={6}>
                             <div className="header">
-                                <h3>Featured Product</h3>
-                                <h2>Popular Products</h2>
+                                <h2>{props.header}</h2>
+                                <h3>{props.secondText}</h3>
                             </div>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-md-6 col-lg-4 col-xl-3">
-                            <div id="product-1" className="single-product">
-                                <Link to="/login" className="part-1">
-                                    <div className="img"></div>
-                                    <ul>
-                                        <li><span><i className="fas fa-shopping-cart"></i></span></li>
-                                        <li><span><i className="fas fa-heart"></i></span></li>
-                                        <li><span><i className="fas fa-plus"></i></span></li>
-                                        <li><span><i className="fas fa-expand"></i></span></li>
-                                    </ul>
-                                </Link>
-                                <div className="part-2">
-                                    <h3 className="product-title">Here Product Title</h3>
-                                    <h4 className="product-old-price">$79.99</h4>
-                                    <h4 className="product-price">$49.99</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-6 col-lg-4 col-xl-3">
-                            <div id="product-2" className="single-product">
-                                <Link to="/product" className="part-1">
-                                    <span className="discount">15% off</span>
-                                    <div className="img"></div>
-                                    <ul>
-                                        <li><span><i className="fas fa-shopping-cart"></i></span></li>
-                                        <li><span><i className="fas fa-heart"></i></span></li>
-                                        <li><span><i className="fas fa-plus"></i></span></li>
-                                        <li><span><i className="fas fa-expand"></i></span></li>
-                                    </ul>
-                                </Link>
-                                <div className="part-2">
-                                    <h3 className="product-title">Here Product Title</h3>
-                                    <h4 className="product-price">$49.99</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-6 col-lg-4 col-xl-3">
-                            <div id="product-3" className="single-product">
-                                <Link to="/product" className="part-1">
-                                    <div className="img"></div>
-                                    <ul>
-                                        <li><span><i className="fas fa-shopping-cart"></i></span></li>
-                                        <li><span><i className="fas fa-heart"></i></span></li>
-                                        <li><span><i className="fas fa-plus"></i></span></li>
-                                        <li><span><i className="fas fa-expand"></i></span></li>
-                                    </ul>
-                                </Link>
-                                <div className="part-2">
-                                    <h3 className="product-title">Here Product Title</h3>
-                                    <h4 className="product-old-price">$79.99</h4>
-                                    <h4 className="product-price">$49.99</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-6 col-lg-4 col-xl-3">
-                            <div id="product-4" className="single-product">
-                                <Link to="/product" className="part-1">
-                                    <span className="new">new</span>
-                                    <div className="img"></div>
-                                    <ul>
-                                        <li><span><i className="fas fa-shopping-cart"></i></span></li>
-                                        <li><span><i className="fas fa-heart"></i></span></li>
-                                        <li><span><i className="fas fa-plus"></i></span></li>
-                                        <li><span><i className="fas fa-expand"></i></span></li>
-                                    </ul>
-                                </Link>
-                                <div className="part-2">
-                                    <h3 className="product-title">Here Product Title</h3>
-                                    <h4 className="product-price">$49.99</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-6 col-lg-4 col-xl-3">
-                            <div id="product-1" className="single-product">
-                                <Link to="/product" className="part-1">
-                                    <div className="img"></div>
-                                    <ul>
-                                        <li><span><i className="fas fa-shopping-cart"></i></span></li>
-                                        <li><span><i className="fas fa-heart"></i></span></li>
-                                        <li><span><i className="fas fa-plus"></i></span></li>
-                                        <li><span><i className="fas fa-expand"></i></span></li>
-                                    </ul>
-                                </Link>
-                                <div className="part-2">
-                                    <h3 className="product-title">Here Product Title</h3>
-                                    <h4 className="product-old-price">$79.99</h4>
-                                    <h4 className="product-price">$49.99</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-6 col-lg-4 col-xl-3">
-                            <div id="product-2" className="single-product">
-                                <Link to="/product" className="part-1">
-                                    <span className="discount">15% off</span>
-                                    <div className="img"></div>
-                                    <ul>
-                                        <li><span><i className="fas fa-shopping-cart"></i></span></li>
-                                        <li><span><i className="fas fa-heart"></i></span></li>
-                                        <li><span><i className="fas fa-plus"></i></span></li>
-                                        <li><span><i className="fas fa-expand"></i></span></li>
-                                    </ul>
-                                </Link>
-                                <div className="part-2">
-                                    <h3 className="product-title">Here Product Title</h3>
-                                    <h4 className="product-price">$49.99</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-6 col-lg-4 col-xl-3">
-                            <div id="product-3" className="single-product">
-                                <Link to="/product" className="part-1">
-                                    <div className="img"></div>
-                                    <ul>
-                                        <li><span><i className="fas fa-shopping-cart"></i></span></li>
-                                        <li><span><i className="fas fa-heart"></i></span></li>
-                                        <li><span><i className="fas fa-plus"></i></span></li>
-                                        <li><span><i className="fas fa-expand"></i></span></li>
-                                    </ul>
-                                </Link>
-                                <div className="part-2">
-                                    <h3 className="product-title">Here Product Title</h3>
-                                    <h4 className="product-old-price">$79.99</h4>
-                                    <h4 className="product-price">$49.99</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <ProductMenuContext.Provider value={productMenuContext!}>
+                            <CardCellComponent id={1} to={"/product"} title={"Book"} price={100} discount={"15"} image={"leather-bag-gray.jpg"} />
+                            <CardCellComponent id={2} to={"/product"} title={"Book"} price={100} discount={"15"} image={"accessories-bag.jpg"} />
+                            <CardCellComponent id={3} to={"/product"} title={"Book"} price={100} discount={"15"} image={"car-interior-design.jpg"} />
+                            <CardCellComponent id={4} to={"/product"} title={"Book"} price={100} discount={"15"} image={"shoes.jpg"} />
+                            <CardCellComponent id={5} to={"/product"} title={"Book"} price={100} discount={"15"} image={"analog-classic.jpg"} />
+                        </ProductMenuContext.Provider>
+                    </Row>
+                </Container>
             </section>
+            <Modal show={isModalShow} onHide={()=> setIsModalShow(false)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+                < Modal.Header closeButton>
+                </Modal.Header >
+                <Modal.Body>
+                    <CldImageComponent folder={"samples/ecommerce"} name={modalImage} />
+                </Modal.Body>
+            </Modal>
         </>
     );
 };
