@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import React, { useRef, useEffect, useState } from 'react';
+import { Container, Row, Col, Badge } from 'react-bootstrap';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { connect } from 'react-redux';
 import $ from 'jquery';
@@ -10,18 +10,21 @@ import { logoutAction } from '../state/actions/authActions';
 import ThemeContext from '../contexts/ThemeContext';
 import AuthContext from '../contexts/AuthContext';
 
+import ShoppingCartComponent from './ShoppingCartComponent';
+
 interface customLinkType {
     to?: string,
     header: string,
     clsName?: string | '',
     span?: boolean | true,
     children?: React.ReactNode,
-    as?:"button" | "link",
-    func?:Function
+    as?: "button" | "link",
+    func?: Function
 }
 
-const NavbarComponent = ({ ...props }:any) => {
+const NavbarComponent = ({ ...props }: any) => {
 
+    const [shoppingCartShow, setShoppingCartShow] = useState(false);
     const toggleMenu = useRef<HTMLAnchorElement>(null);
     const navClone = useRef<HTMLUListElement>(null);
 
@@ -41,8 +44,8 @@ const NavbarComponent = ({ ...props }:any) => {
         const clsName = params.clsName === undefined ? "" : params.clsName;
 
         let child = <NavLink to={params.to!}>{isSpan ? <span>{params.header}</span> : params.header}</NavLink>;
-        if(params.as && params.as === "button")
-            child = <a onClick={()=>params.func!()}>{isSpan ? <span>{params.header}</span> : params.header}</a>;
+        if (params.as && params.as === "button")
+            child = <a onClick={() => params.func!()}>{isSpan ? <span>{params.header}</span> : params.header}</a>;
 
         return (
             <li className={clsName + (location.pathname === params.to ? " active" : "")}>
@@ -57,8 +60,8 @@ const NavbarComponent = ({ ...props }:any) => {
         const clsName = params.clsName === undefined ? "" : params.clsName;
         let child = <NavLink to={params.to!}>{isSpan ? <span>{params.header}</span> : params.header}</NavLink>;
 
-        if(params.as && params.as === "button")
-            child = <a onClick={()=>params.func!()}>{isSpan ? <span>{params.header}</span> : params.header}</a>;
+        if (params.as && params.as === "button")
+            child = <a onClick={() => params.func!()}>{isSpan ? <span>{params.header}</span> : params.header}</a>;
 
         return (
             <li className={clsName + (location.pathname === params.to ? " active" : "")}>
@@ -105,10 +108,18 @@ const NavbarComponent = ({ ...props }:any) => {
         }
     }
 
-    const onLogout = () =>{
+    const onLogout = () => {
         console.log("onLogout");
         const jwtToken = localStorage.getItem("jwtKey");
-        props.logoutAction({token:jwtToken});
+        props.logoutAction({ token: jwtToken });
+    }
+
+    const handleShoppingCartClick = () =>{
+        setShoppingCartShow(true);
+    }
+
+    const handleShoppingCartClose = () =>{
+        setShoppingCartShow(false);
     }
 
     return (
@@ -118,7 +129,7 @@ const NavbarComponent = ({ ...props }:any) => {
                     <div className="site-mobile-menu">
                         <div className="site-mobile-menu-header">
                             <div className="site-mobile-menu-close mt-3">
-                                <span onClick={()=> closeCanvas()} className="fa-solid fa-xmark js-menu-toggle"></span>
+                                <span onClick={() => closeCanvas()} className="fa-solid fa-xmark js-menu-toggle"></span>
                             </div>
                         </div>
                         <div className="site-mobile-menu-body">
@@ -150,8 +161,8 @@ const NavbarComponent = ({ ...props }:any) => {
                         <>
                             {auth.authType === "guest" ?
                                 <div className="d-flex site-mobile-menu-footer border-top">
-                                    <Link to="/login" className="text-black mx-2">Login</Link>
-                                    <Link to="/signup" className="text-black mx-2">Signup</Link>
+                                    <Link to="/login" className="text-app-gray mx-2">Login</Link>
+                                    <Link to="/signup" className="text-app-gray mx-2">Signup</Link>
                                 </div>
                                 :
                                 <div>
@@ -160,7 +171,7 @@ const NavbarComponent = ({ ...props }:any) => {
                                             <div>{auth.authenticatedUser.fullname}</div>
                                             <span onClick={(e) => arrowCollapseClick(e)} className="arrow-collapse" data-toggle="collapse" data-target="#collapseItem3"></span>
                                             <ul className="collapse" id="collapseItem3">
-                                                <ListElementLink key={"8"} as="button" header={"Logout"} func={()=>onLogout()}/>
+                                                <ListElementLink key={"8"} as="button" header={"Logout"} func={() => onLogout()} />
                                             </ul>
                                         </li>
                                     </ul>
@@ -172,7 +183,7 @@ const NavbarComponent = ({ ...props }:any) => {
                         <Row className='align-items-center'>
                             <Col xl={{ span: '2' }} xs={'3'}>
                                 <h1 className="mb-0 site-logo text-center">
-                                    <Link to="/" className="text-black mb-0">Brand</Link>
+                                    <Link to="/" className="text-app-gray mb-0">Brand</Link>
                                 </h1>
                             </Col>
                             <Col xs={'10'} md={'8'} className="d-none d-xl-block">
@@ -201,33 +212,46 @@ const NavbarComponent = ({ ...props }:any) => {
                                     </ul>
                                 </nav>
                             </Col>
-                            <Col xl={2} className="d-none d-xl-flex fs-6">
+                            <Col xl={2} className="d-none d-xl-flex fs-6 mobile-nav-right">
                                 {auth.authType === "guest" ?
                                     <>
-                                        <div className="mx-1"><Link to="/login" className="text-black">Login</Link></div>
-                                        <div className="mx-1"><Link to="/signup" className="text-black">Signup</Link></div>
+                                        <div className="mx-1"><Link to="/login" className="text-app-gray">Login</Link></div>
+                                        <div className="mx-1"><Link to="/signup" className="text-app-gray">Signup</Link></div>
                                     </> :
                                     <nav className="site-navigation position-relative text-center">
                                         <ul className="site-menu me-auto d-none d-lg-block">
                                             <li className="has-children">
                                                 <span>{auth.authenticatedUser.fullname}</span>
                                                 <ul className="dropdown arrow-top">
-                                                    <ListElementLink key={"8"} as="button" header={"Logout"} func={()=>onLogout()}/>
+                                                    <ListElementLink key={"8"} as="button" header={"Logout"} func={() => onLogout()} />
                                                 </ul>
                                             </li>
                                         </ul>
                                     </nav>
-
-
                                 }
+                                <div onClick={()=>handleShoppingCartClick()}><i className="fa-solid fa-cart-shopping"></i><Badge bg="danger" pill={true}>9</Badge></div>
                             </Col>
-                            <Col className="d-inline-block d-xl-none ms-md-0 me-auto py-3 text-end" xs={'9'} style={{ position: "relative", top: 3 + "px" }}>
-                                <a href="#" ref={toggleMenu} onClick={(e) => handleMenuToggle(e)} className="site-menu-toggle js-menu-toggle text-black">
-                                    <i className="fa-solid fa-bars"></i>
-                                </a>
+                            <Col className="d-xl-none ms-md-0 me-auto py-3 mobile-nav-right" xs={'9'}>
+                                <div>
+                                    <Link to="/login" className="text-app-gray"><i className="fa-solid fa-arrow-right-to-bracket"></i></Link>
+                                </div>
+                                <div>
+                                    <Link to="/signup" className="text-app-gray"><i className="fa-solid fa-user-plus"></i></Link>
+                                </div>
+                                <div onClick={()=>handleShoppingCartClick()}>
+                                    <i className="fa-solid fa-cart-shopping text-app-gray"></i>
+                                    <Badge bg="danger" pill={true}>9</Badge>
+                                </div>
+                                <div>
+                                    <span ref={toggleMenu} onClick={(e) => handleMenuToggle(e)} className="site-menu-toggle js-menu-toggle text-app-gray">
+                                        <i className="fa-solid fa-bars"></i>
+                                    </span>
+                                </div>
+
                             </Col>
                         </Row>
                     </Container>
+                    <ShoppingCartComponent show={shoppingCartShow} title={"Shopping Cart"} onClose={()=> handleShoppingCartClose()}/>
                 </header>
             )}
             </AuthContext.Consumer>
@@ -238,6 +262,6 @@ const NavbarComponent = ({ ...props }:any) => {
 
 const mapStateToProps = (state: any) => ({});
 
-const mapDispatchToProps = {logoutAction};
+const mapDispatchToProps = { logoutAction };
 
 export default connect(mapStateToProps, mapDispatchToProps)(NavbarComponent);

@@ -1,10 +1,10 @@
-import React, { useRef, useState, useContext } from 'react';
+import React, { useRef, useContext } from 'react';
 import { Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 import CldImageComponent from './CldImageComponent';
 
-import ProductMenuContext, { ProductMenuContextProvider } from '../contexts/ProductMenuContext';
+import ProductMenuContext from '../contexts/ProductMenuContext';
 
 interface CardCellPropType {
   id: number,
@@ -39,7 +39,7 @@ const CardCellComponent = ({ ...props }: CardCellPropType) => {
 
   return (
     <Col md={6} lg={4} xl={3}>
-      <div id={"product_" + props.id} className="single-product">
+      <div id={"product_" + props.id} className="single-product shadow rounded p-1">
         <div className="part-1">
           {props.discount ? <span className="discount">{props.discount}% off</span> : <></>}
           {props.tag ? <span className="new">{props.tag}</span> : <></>}

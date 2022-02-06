@@ -26,7 +26,7 @@ const ToastComponent = (props: ToastProps) => {
     }
 
     return (
-        <ToastContainer className="p-3" style={{zIndex:2}} position={props.position}>
+        <ToastContainer className="position-fixed p-3" style={{zIndex:2 }} position={props.position}>
             <Toast onClose={()=> handleClose()} show={isShow} delay={props.delay} bg={props.type.toLowerCase()} autohide={props.autohide}>
                 <Toast.Header>
                     <strong className="me-auto"><i className={props.iconClass + " me-2"}></i>{props.header}</strong>

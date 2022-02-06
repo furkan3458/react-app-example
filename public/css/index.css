@@ -54,6 +54,18 @@ a:hover {
     color: var(--app-live-blue)!important;
 }
 
+.text-app-gray {
+    color: var(--app-gray-900)!important;
+}
+
+.text-app-grifindor {
+    color: var(--app-grifindor-red)!important;
+}
+
+.text-app-live {
+    color: var(--app-live-blue)!important;
+}
+
 .hero {
     height: 100vh;
     width: 100%;
@@ -494,6 +506,22 @@ a:hover {
     align-items: center;
 }
 
+.mobile-nav-right {
+    display: block;
+    text-align: end;
+}
+
+.mobile-nav-right>div {
+    display: inline-block;
+    margin-right: .5rem;
+    cursor: pointer;
+}
+
+.mobile-nav-right>div:hover {
+    color: var(--app-live-blue);
+    transition: all .5s;
+}
+
 
 /*Login, Signup*/
 
@@ -774,6 +802,13 @@ textarea.form-control {
 
 .section-products .single-product {
     margin-bottom: 26px;
+}
+
+.section-products .single-product:hover {
+    -webkit-box-shadow: 0px 18px 25px -2px rgba(0, 0, 0, 0.67)!important;
+    -moz-box-shadow: 0px 18px 25px -2px rgba(0, 0, 0, 0.67)!important;
+    box-shadow: 0px 18px 25px -2px rgba(0, 0, 0, 0.67)!important;
+    transition: all .5s;
 }
 
 .section-products .single-product .part-1 {
