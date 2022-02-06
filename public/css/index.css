@@ -66,6 +66,10 @@ a:hover {
     color: var(--app-live-blue)!important;
 }
 
+.fs-7 {
+    font-size: 0.80rem;
+}
+
 .hero {
     height: 100vh;
     width: 100%;
@@ -935,6 +939,105 @@ textarea.form-control {
 .section-products #product-4 .part-1 .img {
     background: url("https://i.ibb.co/cLnZjnS/2.jpg") no-repeat center;
     background-size: cover;
+}
+
+
+/* SHOPPING CART */
+
+.title {
+    padding-top: 20px;
+}
+
+.card {
+    margin: auto;
+    max-width: 950px;
+    width: 90%;
+    box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 1rem;
+    border: transparent
+}
+
+@media(max-width:767px) {
+    .card {
+        margin: 3vh auto
+    }
+}
+
+.cart {
+    background-color: #fff;
+    padding: 0 5vh;
+    border-bottom-left-radius: 1rem;
+    border-top-left-radius: 1rem
+}
+
+.cart>div {
+    border-top: 1px solid var(--app-gray-900);
+}
+
+.cart>div:last-child {
+    border-bottom: 1px solid var(--app-gray-900);
+}
+
+@media(max-width:767px) {
+    .cart {
+        padding: 4vh;
+        border-bottom-left-radius: unset;
+        border-top-right-radius: 1rem
+    }
+}
+
+.summary {
+    background-color: #ddd;
+    border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    padding: 4vh;
+    color: rgb(65, 65, 65)
+}
+
+@media(max-width:767px) {
+    .summary {
+        border-top-right-radius: unset;
+        border-bottom-left-radius: 1rem
+    }
+}
+
+.summary .col-2 {
+    padding: 0
+}
+
+.summary .col-10 {
+    padding: 0
+}
+
+.title b {
+    font-size: 1.5rem
+}
+
+.main {
+    position: relative;
+    margin: 0;
+    padding: 2vh 0;
+    width: 100%
+}
+
+.main span {
+    cursor: pointer;
+}
+
+.close {
+    margin-left: auto;
+    font-size: 0.7rem
+}
+
+.back-to-shop {
+    margin-top: 4.5rem
+}
+
+#code {
+    background-image: linear-gradient(to left, rgba(255, 255, 255, 0.253), rgba(255, 255, 255, 0.185)), url("https://img.icons8.com/small/16/000000/long-arrow-right.png");
+    background-repeat: no-repeat;
+    background-position-x: 95%;
+    background-position-y: center
 }
 
 
