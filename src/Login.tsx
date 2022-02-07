@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Col, Container, Row, Form, Button, Spinner } from 'react-bootstrap';
+import {Helmet} from "react-helmet-async";
 import { Link } from 'react-router-dom';
 import { useSelector, connect } from 'react-redux';
 import $ from 'jquery';
@@ -162,6 +163,10 @@ export const Login = ({ ...props }: any) => {
         </>
         :
         <>
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>Brand - Login</title>
+            </Helmet>
             <ToastComponent type={"Danger"} position={"top-end"} text={toastMessage}
                 show={toastShow} header={"Brand"} iconClass={"fa-solid fa-circle"} delay={5000} autohide={true} close={() => toastCallback()} />
             <NavbarComponent />

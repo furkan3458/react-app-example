@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider, useSelector, connect } from 'react-redux';
+import { HelmetProvider } from 'react-helmet-async';
 
 import reportWebVitals from './reportWebVitals';
 
@@ -10,7 +11,7 @@ import Routes from './routes';
 
 import { StateType } from './state/reducers';
 import { setAuthLoading, setAuthFail, setAuthenticated, validateUser } from './state/actions/authActions';
-import {setShoppingCart} from './state/actions/cartActions';
+import { setShoppingCart } from './state/actions/cartActions';
 
 import ThemeContext from './contexts/ThemeContext';
 import AuthContext, { AuthContextProvider } from './contexts/AuthContext';
@@ -28,7 +29,7 @@ const ReactApp: React.FC = ({ ...props }: any): JSX.Element => {
   const cart = useSelector((state: StateType) => state.cart);
 
   useEffect(() => {
-    if (!loaded) { 
+    if (!loaded) {
       setThemeLevel();
       props.validateUser();
       props.setShoppingCart();
@@ -43,10 +44,10 @@ const ReactApp: React.FC = ({ ...props }: any): JSX.Element => {
   }, [auth.isValidate, cart.isInitializeCart]);
 
   const setAuthLevel = () => {
-    auth.user ? buildAuthenticatedUser("user",auth.user) : buildAuthenticatedUser("guest",[]);
+    auth.user ? buildAuthenticatedUser("user", auth.user) : buildAuthenticatedUser("guest", []);
   }
 
-  const buildAuthenticatedUser = (authType:string, user:any) =>{
+  const buildAuthenticatedUser = (authType: string, user: any) => {
     let authUser: AuthContextProvider = {
       authType: authType,
       authenticatedUser: {
@@ -58,17 +59,17 @@ const ReactApp: React.FC = ({ ...props }: any): JSX.Element => {
         roles: []
       }
     }
-      if(authType === "user"){
-        authUser.authenticatedUser.token = user.token;
-        authUser.authenticatedUser.id = user.id;
-        authUser.authenticatedUser.fullname = user.fullname;
-        authUser.authenticatedUser.username = user.username;
-        authUser.authenticatedUser.email = user.email;
-        authUser.authenticatedUser.roles = user.roles;
-      }
+    if (authType === "user") {
+      authUser.authenticatedUser.token = user.token;
+      authUser.authenticatedUser.id = user.id;
+      authUser.authenticatedUser.fullname = user.fullname;
+      authUser.authenticatedUser.username = user.username;
+      authUser.authenticatedUser.email = user.email;
+      authUser.authenticatedUser.roles = user.roles;
+    }
 
-      setauthLocale(authType);
-      setauthenticatedUser(authUser);
+    setauthLocale(authType);
+    setauthenticatedUser(authUser);
   }
 
   const setThemeLevel = () => {
@@ -83,11 +84,13 @@ const ReactApp: React.FC = ({ ...props }: any): JSX.Element => {
 
   return ((!loaded || !auth.isValidate || !cart.isInitializeCart) ? <SpinnerComponent /> :
     <BrowserRouter>
-      <AuthContext.Provider value={authenticatedUser!}>
-        <ThemeContext.Provider value={theme}>
-          <Routes auth={authLocale} />
-        </ThemeContext.Provider>
-      </AuthContext.Provider>
+      <HelmetProvider>
+        <AuthContext.Provider value={authenticatedUser!}>
+          <ThemeContext.Provider value={theme}>
+            <Routes auth={authLocale} />
+          </ThemeContext.Provider>
+        </AuthContext.Provider>
+      </HelmetProvider>
     </BrowserRouter>
   );
 };
@@ -106,7 +109,7 @@ const App = () => {
 }
 
 ReactDOM.render(
-  <App/>,
+  <App />,
   document.getElementById('root')
 );
 

@@ -1,10 +1,15 @@
 import { Container, Row, Col } from 'react-bootstrap';
 import {Link} from 'react-router-dom';
+import {Helmet} from 'react-helmet-async';
 
 const Error = () => {
 
     return (
         <Container>
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>Brand - Page not found</title>
+            </Helmet>
             <Row className="min-vh-100">
                 <Col xs={12} className="d-flex flex-wrap justify-content-center align-items-center">
                     <div className="loader animation-7">

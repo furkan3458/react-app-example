@@ -1,6 +1,7 @@
 import React, { useState,useEffect } from 'react';
 import { Container,Row,Col } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+import { Helmet } from 'react-helmet-async';
 
 import { StateType } from './state/reducers';
 
@@ -30,6 +31,10 @@ const Home = ({...props}: any) => {
         </>
         :
         <>
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>Brand - Home</title>
+            </Helmet>
             <NavbarComponent />
             <Container>
                 <Row>
