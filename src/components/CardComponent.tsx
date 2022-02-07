@@ -1,22 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { connect, useSelector } from 'react-redux';
+import { Col, Container, Row, Modal } from 'react-bootstrap';
 
 import { StateType } from '../state/reducers';
-import { Col, Container, Row, Modal } from 'react-bootstrap';
+
+import { CartProductType } from '../state/reducers/cartReducer';
+
+import { setShoppingCartAdd, setShoppingCartUpdate } from '../state/actions/cartActions';
 
 import CardCellComponent from './CardCellComponent';
 import ToastComponent from './ToastComponent';
 import CldImageComponent from './CldImageComponent';
 
-import ProductMenuContext,{ProductMenuContextProvider} from '../contexts/ProductMenuContext';
+import ProductMenuContext, { ProductMenuContextProvider } from '../contexts/ProductMenuContext';
 
 interface CardPropType {
     header: string,
     secondText: string,
+    setShoppingCartAdd?: Function,
+    setShoppingCartUpdate?: Function
 }
 
 const CardComponent = (props: CardPropType) => {
-
     const [isModalShow, setIsModalShow] = useState(false);
     const [modalImage, setModalImage] = useState("");
     const [toastShow, settoastShow] = useState(false);
@@ -25,42 +30,82 @@ const CardComponent = (props: CardPropType) => {
 
     const products = useSelector((state: StateType) => state.products);
     const auth = useSelector((state: StateType) => state.auth);
+    const cart = useSelector((state: StateType) => state.cart);
 
     useEffect(() => {
         initProductMenuContext();
     }, []);
 
-    const initProductMenuContext = () =>{
-        let context:ProductMenuContextProvider = {
-            fullscreen : handleFullscreen,
-            addCart : handleAddCart,
-            addFavorites : handleAddFavorites
+    useEffect(() => {
+        if(!cart.isCartLoading)
+            saveCartToLocal();
+            
+    }, [cart.isCartLoading]);
+
+    const initProductMenuContext = () => {
+        let context: ProductMenuContextProvider = {
+            fullscreen: handleFullscreen,
+            addCart: handleAddCart,
+            addFavorites: handleAddFavorites,
+            toastCallback: handleToastCallback
         }
 
         setProductMenuContext(context);
     }
-    
-    const handleAddFavorites = (id:number) => {
-        
-        if(!auth.isAuthenticated){
+
+    const saveCartToLocal = () => {
+        localStorage.setItem("chart", JSON.stringify(cart.cartProducts));
+        localStorage.setItem("chart-count",Number(cart.cartProducts.length).toString());
+    }
+
+    const handleAddFavorites = (id: number) => {
+        if (!auth.isAuthenticated) {
             console.log(auth);
             setToastMessage("You must be logged in to add the product to your favourites.")
             settoastShow(true);
         }
-        console.log("handleAddFavorites --CardComponent",id);
     }
 
-    const handleAddCart = (id:number) =>{
-        console.log("handleAddCart --CardComponent",id);
-    } 
+    const handleAddCart = (id: number, ref: HTMLDivElement) => {
+        if (ref == null)
+            return;
 
-    const handleFullscreen = (id:number, image:string) =>{
-        console.log("handleFullscreen --CardComponent",id);
+        const cartProducts: CartProductType[] = cart.cartProducts;
+
+        const index = cartProducts.findIndex(value => { return value.id === id });
+
+        //product state içerisinden id bulunup alınacak
+        if (index === -1) {
+            let cartProduct: CartProductType = {
+                id: id,
+                amount: 1,
+                name: "Test",
+                secondtext: "Test2",
+                image: "",
+                price: 100,
+            };
+
+            props.setShoppingCartAdd!(cartProduct);
+        } else {
+            //Fiyat güncellemeside yap!!
+            let cartProduct: CartProductType = Object.assign({},cartProducts[index]);
+            cartProduct.amount = cartProduct.amount + 1;
+
+            props.setShoppingCartUpdate!(cartProduct, index);
+        }
+    }
+
+    const handleFullscreen = (id: number, image: string) => {
         setModalImage(image);
         setIsModalShow(true);
     }
 
-    const handleToastClose = () =>{
+    const handleToastCallback = (message: string) => {
+        setToastMessage(message);
+        settoastShow(true);
+    }
+
+    const handleToastClose = () => {
         settoastShow(false);
     }
 
@@ -89,7 +134,7 @@ const CardComponent = (props: CardPropType) => {
                     </Row>
                 </Container>
             </section>
-            <Modal show={isModalShow} onHide={()=> setIsModalShow(false)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+            <Modal show={isModalShow} onHide={() => setIsModalShow(false)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
                 < Modal.Header closeButton>
                 </Modal.Header >
                 <Modal.Body>
@@ -100,4 +145,8 @@ const CardComponent = (props: CardPropType) => {
     );
 };
 
-export default CardComponent;
+const mapStateToProps = (state: any) => ({});
+
+const mapDispatchToProps = { setShoppingCartAdd, setShoppingCartUpdate };
+
+export default connect(mapStateToProps, mapDispatchToProps)(CardComponent);

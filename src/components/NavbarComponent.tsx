@@ -1,9 +1,11 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Container, Row, Col, Badge } from 'react-bootstrap';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { connect } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import $ from 'jquery';
 import { Collapse } from 'bootstrap';
+
+import { StateType } from '../state/reducers';
 
 import { logoutAction } from '../state/actions/authActions';
 
@@ -27,6 +29,8 @@ const NavbarComponent = ({ ...props }: any) => {
     const [shoppingCartShow, setShoppingCartShow] = useState(false);
     const toggleMenu = useRef<HTMLAnchorElement>(null);
     const navClone = useRef<HTMLUListElement>(null);
+
+    const cart = useSelector((state: StateType) => state.cart);
 
     useEffect(() => {
         siteMenuClone();
@@ -109,7 +113,6 @@ const NavbarComponent = ({ ...props }: any) => {
     }
 
     const onLogout = () => {
-        console.log("onLogout");
         const jwtToken = localStorage.getItem("jwtKey");
         props.logoutAction({ token: jwtToken });
     }
@@ -215,8 +218,8 @@ const NavbarComponent = ({ ...props }: any) => {
                             <Col xl={2} className="d-none d-xl-flex fs-6 mobile-nav-right">
                                 {auth.authType === "guest" ?
                                     <>
-                                        <div className="mx-1"><Link to="/login" className="text-app-gray">Login</Link></div>
-                                        <div className="mx-1"><Link to="/signup" className="text-app-gray">Signup</Link></div>
+                                        <div className="mx-2"><Link to="/login" className="text-app-gray">Login</Link></div>
+                                        <div className={"mx-2" + (cart.productCount === 0 ? " me-4" : "")}><Link to="/signup" className="text-app-gray">Signup</Link></div>
                                     </> :
                                     <nav className="site-navigation position-relative text-center">
                                         <ul className="site-menu me-auto d-none d-lg-block">
@@ -229,7 +232,10 @@ const NavbarComponent = ({ ...props }: any) => {
                                         </ul>
                                     </nav>
                                 }
-                                <div onClick={()=>handleShoppingCartClick()}><i className="fa-solid fa-cart-shopping"></i><Badge bg="danger" pill={true}>9</Badge></div>
+                                <div className="d-flex align-items-center" onClick={()=>handleShoppingCartClick()}>
+                                    <i className="fa-solid fa-cart-shopping"></i>
+                                    {cart.productCount !== 0 && <Badge bg="danger" pill={true}>{cart.productCount}</Badge>}
+                                </div>
                             </Col>
                             <Col className="d-xl-none ms-md-0 me-auto py-3 mobile-nav-right" xs={'9'}>
                                 <div>
@@ -240,7 +246,7 @@ const NavbarComponent = ({ ...props }: any) => {
                                 </div>
                                 <div onClick={()=>handleShoppingCartClick()}>
                                     <i className="fa-solid fa-cart-shopping text-app-gray"></i>
-                                    <Badge bg="danger" pill={true}>9</Badge>
+                                    {cart.productCount !== 0 && <Badge bg="danger" pill={true}>{cart.productCount}</Badge>}
                                 </div>
                                 <div>
                                     <span ref={toggleMenu} onClick={(e) => handleMenuToggle(e)} className="site-menu-toggle js-menu-toggle text-app-gray">

@@ -517,7 +517,7 @@ a:hover {
 
 .mobile-nav-right>div {
     display: inline-block;
-    margin-right: .5rem;
+    margin-right: .6rem;
     cursor: pointer;
 }
 
@@ -963,23 +963,14 @@ textarea.form-control {
     }
 }
 
-.cart {
+.cart-cell {
     background-color: #fff;
     padding: 0 5vh;
-    border-bottom-left-radius: 1rem;
-    border-top-left-radius: 1rem
-}
-
-.cart>div {
-    border-top: 1px solid var(--app-gray-900);
-}
-
-.cart>div:last-child {
     border-bottom: 1px solid var(--app-gray-900);
 }
 
 @media(max-width:767px) {
-    .cart {
+    .cart-cell {
         padding: 4vh;
         border-bottom-left-radius: unset;
         border-top-right-radius: 1rem

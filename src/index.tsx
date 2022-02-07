@@ -10,6 +10,7 @@ import Routes from './routes';
 
 import { StateType } from './state/reducers';
 import { setAuthLoading, setAuthFail, setAuthenticated, validateUser } from './state/actions/authActions';
+import {setShoppingCart} from './state/actions/cartActions';
 
 import ThemeContext from './contexts/ThemeContext';
 import AuthContext, { AuthContextProvider } from './contexts/AuthContext';
@@ -24,20 +25,22 @@ const ReactApp: React.FC = ({ ...props }: any): JSX.Element => {
   const [loaded, setloaded] = useState(false);
 
   const auth = useSelector((state: StateType) => state.auth);
+  const cart = useSelector((state: StateType) => state.cart);
 
   useEffect(() => {
     if (!loaded) { 
       setThemeLevel();
       props.validateUser();
+      props.setShoppingCart();
     }
   }, []);
 
   useEffect(() => {
-    if (auth.isValidate) {
+    if (auth.isValidate && cart.isInitializeCart) {
       setAuthLevel();
       setloaded(true);
     }
-  }, [auth.isValidate]);
+  }, [auth.isValidate, cart.isInitializeCart]);
 
   const setAuthLevel = () => {
     auth.user ? buildAuthenticatedUser("user",auth.user) : buildAuthenticatedUser("guest",[]);
@@ -78,7 +81,7 @@ const ReactApp: React.FC = ({ ...props }: any): JSX.Element => {
     settheme(themeStorage);
   }
 
-  return ((!loaded || !auth.isValidate) ? <SpinnerComponent /> :
+  return ((!loaded || !auth.isValidate || !cart.isInitializeCart) ? <SpinnerComponent /> :
     <BrowserRouter>
       <AuthContext.Provider value={authenticatedUser!}>
         <ThemeContext.Provider value={theme}>
@@ -89,7 +92,7 @@ const ReactApp: React.FC = ({ ...props }: any): JSX.Element => {
   );
 };
 
-const mapDispatchToProps = { setAuthLoading, setAuthFail, setAuthenticated, validateUser };
+const mapDispatchToProps = { setAuthLoading, setAuthFail, setAuthenticated, validateUser, setShoppingCart };
 const ConectedReactApp = connect(null, mapDispatchToProps)(ReactApp);
 
 const App = () => {

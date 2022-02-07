@@ -1,7 +1,7 @@
 import action from '../../utils/action';
 import ActionTypes from '../../utils/types';
 
-interface productState{
+export interface productState{
     isProductLoading:boolean,
     products:productType[],
 }

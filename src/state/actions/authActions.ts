@@ -36,7 +36,6 @@ export const loadUser = (user:any) => (dispatch:Dispatch<Action>) => {
     dispatch({type:ActionTypes.AUTH_LOADING, payload:true});
     axios.post("api/auth/signin",user).then(response => {
         const data = response.data;
-        console.log(data);
         dispatch({type:ActionTypes.AUTH_LOADING, payload:false});
         
         if(data.error === undefined || data.error === null){

@@ -1,10 +1,13 @@
-import React, { useRef, useContext } from 'react';
-import { Col } from 'react-bootstrap';
+import { useRef, useContext, useEffect, useState } from 'react';
+import { Col, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+
+import { useTypedSelector } from '../state/reducers';
 
 import CldImageComponent from './CldImageComponent';
 
 import ProductMenuContext from '../contexts/ProductMenuContext';
+import { CartProductType,CartState } from '../state/reducers/cartReducer';
 
 interface CardCellPropType {
   id: number,
@@ -14,32 +17,67 @@ interface CardCellPropType {
   image: string,
   oldPrice?: number,
   tag?: string,
-  discount?: string
+  discount?: string,
 }
 
-const CardCellComponent = ({ ...props }: CardCellPropType) => {
+const CardCellComponent = ({ ...props }: CardCellPropType): JSX.Element => {
 
   const context = useContext(ProductMenuContext);
-  //const navClone = useRef<HTMLUListElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isAddingCart, setisAddingCart] = useState(false);
+  const [addedCount, setAddedCount] = useState(0);
 
-  const onShoppingChartClick = (id: number) => {
-    console.log("onShoppingChart", id);
-    context.addCart!(id);
+  const cart:CartState = useTypedSelector<CartState>(state => state.cart);
+
+  useEffect(() => {
+    if (!cart.isCartLoading && isAddingCart)
+      checkItemOnChart();
+
+  }, [cart.isCartLoading]);
+
+
+  const onShoppingChartClick = () => {
+    if (cart.isCartLoading) {
+      context.toastCallback!("Please wait...");
+      return;
+    }
+    const cartProducts: CartProductType[] = cart.cartProducts;
+    const index = cartProducts.findIndex(value => { return value.id === props.id });
+
+    if(index !== -1)
+      setAddedCount(cartProducts[index].amount);
+
+    setisAddingCart(true);
+    context.addCart!(props.id, cardRef.current);
   }
 
-  const onFavoritesClick = (id: number) => {
-    console.log("onFavorites", id);
-    context.addFavorites!(id);
+  const onFavoritesClick = () => {
+    console.log("onFavorites", props.id);
+    
+    context.addFavorites!(props.id);
   }
 
-  const onFullScreenClick = (id: number) => {
-    console.log("Fullscreen", id);
-    context.fullscreen!(id,props.image);
+  const onFullScreenClick = () => {
+    context.fullscreen!(props.id, props.image);
+  }
+
+  const checkItemOnChart = () => {
+    setisAddingCart(false);
+    const cartProducts: CartProductType[] = cart.cartProducts;
+
+    const index = cartProducts.findIndex(value => { return value.id === props.id });
+
+    if (index !== -1 && addedCount !== cartProducts[index].amount && cartProducts[index].amount === 1)
+      context.toastCallback!("Product has successfully added to your cart.");
+    else if(index !== -1 && addedCount !== cartProducts[index].amount)
+      context.toastCallback!("Product has successfully updated.");
+    else
+      context.toastCallback!("The product could not be added to your cart.");
   }
 
   return (
     <Col md={6} lg={4} xl={3}>
-      <div id={"product_" + props.id} className="single-product shadow rounded p-1">
+      <div ref={cardRef} id={"product_" + props.id} className="single-product shadow rounded p-1">
         <div className="part-1">
           {props.discount ? <span className="discount">{props.discount}% off</span> : <></>}
           {props.tag ? <span className="new">{props.tag}</span> : <></>}
@@ -49,10 +87,10 @@ const CardCellComponent = ({ ...props }: CardCellPropType) => {
             </div>
           </Link>
           <ul className="menu">
-            <li><span onClick={() => onShoppingChartClick(props.id)}><i className="fas fa-shopping-cart"></i></span></li>
-            <li><span onClick={() => onFavoritesClick(props.id)}><i className="fas fa-heart"></i></span></li>
+            <li><span onClick={() => onShoppingChartClick()}>{cart.isCartLoading ? <Spinner animation="grow" size="sm" /> : <i className="fas fa-shopping-cart"></i>}</span></li>
+            <li><span onClick={() => onFavoritesClick()}><i className="fas fa-heart"></i></span></li>
             <li><span ><i className="fas fa-plus"></i></span></li>
-            <li><span onClick={() => onFullScreenClick(props.id)}><i className="fas fa-expand"></i></span></li>
+            <li><span onClick={() => onFullScreenClick()}><i className="fas fa-expand"></i></span></li>
           </ul>
         </div>
         <div className="part-2">
