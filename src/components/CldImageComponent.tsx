@@ -3,7 +3,7 @@ import {Cloudinary} from "@cloudinary/url-gen";
 import { Image } from 'react-bootstrap';
 const cld = new Cloudinary({
     cloud: {
-      cloudName: 'bookerapp'
+      cloudName: 'imagerapp'
     }
 });
 

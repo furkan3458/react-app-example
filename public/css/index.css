@@ -1094,7 +1094,6 @@ textarea.form-control {
 
 .message-box {
     color: var(--app-gray-900);
-    font-family: 'Quicksand';
     font-weight: 500;
     font-size: 3vmax!important;
     padding: 0 2vmax;

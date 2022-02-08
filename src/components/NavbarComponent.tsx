@@ -1,9 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Container, Row, Col, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Badge, Collapse } from 'react-bootstrap';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import $ from 'jquery';
-import { Collapse } from 'bootstrap';
 
 import { StateType } from '../state/reducers';
 
