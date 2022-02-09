@@ -1,22 +1,22 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Col, Container, Row, Form, Button, Spinner } from 'react-bootstrap';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { useSelector, connect } from 'react-redux';
 import $ from 'jquery';
 
-import { StateType } from './state/reducers';
-import { ValidityStates } from './state/reducers/authReducer';
-import { setDefaultValidateUsername, setDefaultValidateEmail, setAuthFail, signupAuthAction, validateUsernameAuthAction, validateEmailAuthAction } from './state/actions/authActions';
+import { StateType } from '../state/reducers';
+import { ValidityStates } from '../state/reducers/authReducer';
+import { setDefaultValidateUsername, setDefaultValidateEmail, setAuthFail, signupAuthAction, validateUsernameAuthAction, validateEmailAuthAction } from '../state/actions/authActions';
 
-import NavbarComponent from './components/NavbarComponent';
-import SpinnerComponent from './components/SpinnerComponent';
-import FooterComponent from './components/FooterComponent';
-import ToastComponent from './components/ToastComponent';
-import AlertComponent from './components/AlertComponent';
+import NavbarComponent from '../components/NavbarComponent';
+import SpinnerComponent from '../components/SpinnerComponent';
+import FooterComponent from '../components/FooterComponent';
+import AlertComponent from '../components/AlertComponent';
 
+import ToastContext, { ToastContextProvider } from '../contexts/ToastContext';
 
-export const Signup = ({ ...props }: any) => {
+const Signup = ({ ...props }: any) => {
     const [username, setusername] = useState("");
     const [password, setpassword] = useState("");
     const [email, setemail] = useState("");
@@ -27,8 +27,7 @@ export const Signup = ({ ...props }: any) => {
     const [fullnameValid, setfullnameValid] = useState(false);
     const [loaded, setLoaded] = useState(false);
 
-    const [toastShow, settoastShow] = useState(false);
-    const [toastMessage, settoastMessage] = useState("");
+    const toastContext = useContext<ToastContextProvider>(ToastContext);
 
     const passwordSpan = useRef<HTMLSpanElement>(null);
     const usernameInput = useRef<HTMLInputElement>(null);
@@ -80,33 +79,28 @@ export const Signup = ({ ...props }: any) => {
     const onSubmitFormClick = (e: any) => {
         e.preventDefault();
         if (auth.isLoading) {
-            settoastMessage("Please wait...");
-            settoastShow(true);
+            toastContext.toastInfo("Please wait...");
             return;
         }
 
         if ((username === "" || !usernameValid) && usernameInput.current) {
             usernameInput.current.focus();
-            settoastMessage("Please Enter the valid username.");
-            settoastShow(true);
+            toastContext.toastError("Please enter valid username.");
             return;
         }
         else if ((email === "" || !emailValid) && emailInput.current) {
             emailInput.current.focus();
-            settoastMessage("Please Enter the valid email.");
-            settoastShow(true);
+            toastContext.toastError("Please enter valid email.");
             return;
         }
         else if ((fullname === "" || !fullnameValid) && fullnameInput.current) {
             fullnameInput.current.focus();
-            settoastMessage("Please Enter the valid email.");
-            settoastShow(true);
+            toastContext.toastError("Please enter your fullname.");
             return;
         }
         else if ((password === "" || !passwordValid) && passwordInput.current) {
             passwordInput.current.focus();
-            settoastMessage("Please Enter the valid password.");
-            settoastShow(true);
+            toastContext.toastError("Please enter a valid password.");
             return;
         }
 
@@ -231,11 +225,6 @@ export const Signup = ({ ...props }: any) => {
         }
     }
 
-    const toastCallback: Function = () => {
-        if (toastShow)
-            settoastShow(false);
-    }
-
     const handleUsernameValidity = () =>{
         let $this = $(usernameInput.current!);
         switch(auth.usernameValidity.validateState){
@@ -300,8 +289,6 @@ export const Signup = ({ ...props }: any) => {
                 <meta charSet="utf-8" />
                 <title>Brand - Signup</title>
             </Helmet>
-            <ToastComponent type={"Danger"} position={"top-end"} text={toastMessage}
-                show={toastShow} header={"Brand"} iconClass={"fa-solid fa-circle"} delay={5000} autohide={true} close={() => toastCallback()} />
             <NavbarComponent />
             <section className="ftco-section text-black">
                 <Container>

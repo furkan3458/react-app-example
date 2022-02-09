@@ -1,7 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Container, Row, Col, Badge, Collapse } from 'react-bootstrap';
+import { Container, Row, Col, Badge } from 'react-bootstrap';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
+import { Collapse } from 'bootstrap';
 import $ from 'jquery';
 
 import { StateType } from '../state/reducers';
@@ -91,7 +92,7 @@ const NavbarComponent = ({ ...props }: any) => {
         $this.toggleClass('active');
         $this.toggleClass('collapsed');
 
-        new Collapse(target, { toggle: true, parent: $this })
+        new Collapse(target, { toggle: true, parent: $this });
 
         e.preventDefault();
     }
@@ -116,11 +117,11 @@ const NavbarComponent = ({ ...props }: any) => {
         props.logoutAction({ token: jwtToken });
     }
 
-    const handleShoppingCartClick = () =>{
+    const handleShoppingCartClick = () => {
         setShoppingCartShow(true);
     }
 
-    const handleShoppingCartClose = () =>{
+    const handleShoppingCartClose = () => {
         setShoppingCartShow(false);
     }
 
@@ -231,7 +232,7 @@ const NavbarComponent = ({ ...props }: any) => {
                                         </ul>
                                     </nav>
                                 }
-                                <div className="d-flex align-items-center" onClick={()=>handleShoppingCartClick()}>
+                                <div className="d-flex align-items-center" onClick={() => handleShoppingCartClick()}>
                                     <i className="fa-solid fa-cart-shopping"></i>
                                     {cart.productCount !== 0 && <Badge bg="danger" pill={true}>{cart.productCount}</Badge>}
                                 </div>
@@ -243,7 +244,7 @@ const NavbarComponent = ({ ...props }: any) => {
                                 <div>
                                     <Link to="/signup" className="text-app-gray"><i className="fa-solid fa-user-plus"></i></Link>
                                 </div>
-                                <div onClick={()=>handleShoppingCartClick()}>
+                                <div onClick={() => handleShoppingCartClick()}>
                                     <i className="fa-solid fa-cart-shopping text-app-gray"></i>
                                     {cart.productCount !== 0 && <Badge bg="danger" pill={true}>{cart.productCount}</Badge>}
                                 </div>
@@ -256,7 +257,7 @@ const NavbarComponent = ({ ...props }: any) => {
                             </Col>
                         </Row>
                     </Container>
-                    <ShoppingCartComponent show={shoppingCartShow} title={"Shopping Cart"} onClose={()=> handleShoppingCartClose()}/>
+                    <ShoppingCartComponent show={shoppingCartShow} title={"Shopping Cart"} onClose={() => handleShoppingCartClose()} />
                 </header>
             )}
             </AuthContext.Consumer>

@@ -22,8 +22,6 @@ interface ShoppingCartProps {
 const ShoppingCartComponent = (props: ShoppingCartProps) => {
 
     const [show, setShow] = useState(props.show);
-    const [toastShow, setToastShow] = useState(false);
-    const [toastMessage, setToastMessage] = useState("");
     const [amountMenuContext, setAmountMenuContext] = useState<AmountContextProdiver>();
     const cart = useSelector((state: StateType) => state.cart);
 
@@ -44,7 +42,6 @@ const ShoppingCartComponent = (props: ShoppingCartProps) => {
             increase: handleIncreaseAmount,
             decrease: handleDecreaseAmount,
             remove: handleRemoveItem,
-            toast: handleToast,
         }
 
         setAmountMenuContext(context);
@@ -86,25 +83,13 @@ const ShoppingCartComponent = (props: ShoppingCartProps) => {
         props.setShoppingCartRemove!(cartProduct, index);
     }
 
-    const handleToast = (message:string) =>{
-        setToastMessage(message);
-        setToastShow(true);
-    }
-
     const handleClose = () => {
         setShow(false);
-        handleToastClose();
         props.onClose();
-    }
-
-    const handleToastClose = () =>{
-        setToastShow(false);
     }
 
     return (
         <>
-            <ToastComponent type={"Danger"} position={"bottom-start"} text={toastMessage}
-                show={toastShow} header={"Brand"} iconClass={"fa-solid fa-circle"} delay={5000} autohide={true} close={() => handleToastClose()} />
             <Offcanvas show={isShow} onHide={handleClose} placement={'end'} scroll={true}>
                 <Offcanvas.Header closeButton className="border-bottom">
                     <Offcanvas.Title className="w-100">

@@ -3,13 +3,13 @@ import { Container,Row,Col } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet-async';
 
-import { StateType } from './state/reducers';
+import { StateType } from '../state/reducers';
 
-import SliderComponent from './components/SliderComponent';
-import NavbarComponent from './components/NavbarComponent';
-import SpinnerComponent from  './components/SpinnerComponent';
-import FooterComponent from './components/FooterComponent';
-import CardComponent from './components/CardComponent';
+import SliderComponent from '../components/SliderComponent';
+import NavbarComponent from '../components/NavbarComponent';
+import SpinnerComponent from  '../components/SpinnerComponent';
+import FooterComponent from '../components/FooterComponent';
+import CardComponent from '../components/CardComponent';
 
 
 const Home = ({...props}: any) => {

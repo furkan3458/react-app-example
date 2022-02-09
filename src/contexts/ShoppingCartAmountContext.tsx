@@ -1,17 +1,17 @@
 import React from "react";
 
+import empty from "../utils/empty";
+
 export interface AmountContextProdiver{
-    increase:Function | undefined;
-    decrease:Function | undefined;
-    remove:Function | undefined;
-    toast:Function | undefined;
+    increase:Function;
+    decrease:Function;
+    remove:Function;
 }
 
 const initialize:AmountContextProdiver = {
-    increase:undefined,
-    decrease:undefined,
-    remove:undefined,
-    toast:undefined,
+    increase:empty,
+    decrease:empty,
+    remove:empty,
 }
 
 const ShoppingCartAmountContext = React.createContext(initialize);

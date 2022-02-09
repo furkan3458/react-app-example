@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { connect, useSelector } from 'react-redux';
 import { Col, Container, Row, Modal } from 'react-bootstrap';
 
@@ -9,10 +9,10 @@ import { CartProductType } from '../state/reducers/cartReducer';
 import { setShoppingCartAdd, setShoppingCartUpdate } from '../state/actions/cartActions';
 
 import CardCellComponent from './CardCellComponent';
-import ToastComponent from './ToastComponent';
 import CldImageComponent from './CldImageComponent';
 
 import ProductMenuContext, { ProductMenuContextProvider } from '../contexts/ProductMenuContext';
+import ToastContext, { ToastContextProvider } from '../contexts/ToastContext';
 
 interface CardPropType {
     header: string,
@@ -24,9 +24,8 @@ interface CardPropType {
 const CardComponent = (props: CardPropType) => {
     const [isModalShow, setIsModalShow] = useState(false);
     const [modalImage, setModalImage] = useState("");
-    const [toastShow, settoastShow] = useState(false);
-    const [toastMessage, setToastMessage] = useState("");
     const [productMenuContext, setProductMenuContext] = useState<ProductMenuContextProvider>();
+    const toastContext = useContext<ToastContextProvider>(ToastContext);
 
     const products = useSelector((state: StateType) => state.products);
     const auth = useSelector((state: StateType) => state.auth);
@@ -37,9 +36,9 @@ const CardComponent = (props: CardPropType) => {
     }, []);
 
     useEffect(() => {
-        if(!cart.isCartLoading)
+        if (!cart.isCartLoading)
             saveCartToLocal();
-            
+
     }, [cart.isCartLoading]);
 
     const initProductMenuContext = () => {
@@ -47,7 +46,6 @@ const CardComponent = (props: CardPropType) => {
             fullscreen: handleFullscreen,
             addCart: handleAddCart,
             addFavorites: handleAddFavorites,
-            toastCallback: handleToastCallback
         }
 
         setProductMenuContext(context);
@@ -55,20 +53,21 @@ const CardComponent = (props: CardPropType) => {
 
     const saveCartToLocal = () => {
         localStorage.setItem("chart", JSON.stringify(cart.cartProducts));
-        localStorage.setItem("chart-count",Number(cart.cartProducts.length).toString());
+        localStorage.setItem("chart-count", Number(cart.cartProducts.length).toString());
     }
 
     const handleAddFavorites = (id: number) => {
         if (!auth.isAuthenticated) {
-            console.log(auth);
-            setToastMessage("You must be logged in to add the product to your favourites.")
-            settoastShow(true);
+            toastContext.toastInfo("You must be logged in to add the product to your favourites.");
+            return;
         }
     }
 
     const handleAddCart = (id: number, ref: HTMLDivElement) => {
-        if (ref == null)
+        if (ref === null){
+            toastContext.toastError("An error occurred. Please refresh this page.");
             return;
+        } 
 
         const cartProducts: CartProductType[] = cart.cartProducts;
 
@@ -88,7 +87,7 @@ const CardComponent = (props: CardPropType) => {
             props.setShoppingCartAdd!(cartProduct);
         } else {
             //Fiyat güncellemeside yap!!
-            let cartProduct: CartProductType = Object.assign({},cartProducts[index]);
+            let cartProduct: CartProductType = Object.assign({}, cartProducts[index]);
             cartProduct.amount = cartProduct.amount + 1;
 
             props.setShoppingCartUpdate!(cartProduct, index);
@@ -100,19 +99,8 @@ const CardComponent = (props: CardPropType) => {
         setIsModalShow(true);
     }
 
-    const handleToastCallback = (message: string) => {
-        setToastMessage(message);
-        settoastShow(true);
-    }
-
-    const handleToastClose = () => {
-        settoastShow(false);
-    }
-
     return (
         <>
-            <ToastComponent type={"Danger"} position={"bottom-end"} text={toastMessage}
-                show={toastShow} header={"Brand"} iconClass={"fa-solid fa-circle"} delay={5000} autohide={true} close={() => handleToastClose()} />
             <section className="section-products">
                 <Container>
                     <Row className="justify-content-center text-center">

@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider, useSelector, connect } from 'react-redux';
 import { HelmetProvider } from 'react-helmet-async';
+import { ToastContainer, toast } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 import reportWebVitals from './reportWebVitals';
 
@@ -15,6 +18,7 @@ import { setShoppingCart } from './state/actions/cartActions';
 
 import ThemeContext from './contexts/ThemeContext';
 import AuthContext, { AuthContextProvider } from './contexts/AuthContext';
+import ToastContext, { ToastContextProvider } from './contexts/ToastContext';
 
 import SpinnerComponent from './components/SpinnerComponent';
 
@@ -22,6 +26,7 @@ const ReactApp: React.FC = ({ ...props }: any): JSX.Element => {
 
   const [authLocale, setauthLocale] = useState("guest");
   const [authenticatedUser, setauthenticatedUser] = useState<AuthContextProvider>();
+  const [toastContext, setToastContext] = useState<ToastContextProvider>();
   const [theme, settheme] = useState("light");
   const [loaded, setloaded] = useState(false);
 
@@ -31,6 +36,7 @@ const ReactApp: React.FC = ({ ...props }: any): JSX.Element => {
   useEffect(() => {
     if (!loaded) {
       setThemeLevel();
+      initToastContext();
       props.validateUser();
       props.setShoppingCart();
     }
@@ -43,8 +49,35 @@ const ReactApp: React.FC = ({ ...props }: any): JSX.Element => {
     }
   }, [auth.isValidate, cart.isInitializeCart]);
 
+  const initToastContext = () => {
+    const context: ToastContextProvider = {
+      toastSuccess: handleToastSuccess,
+      toastInfo: handleToastInfo,
+      toastError: handleToastError,
+      toastWarn: handleToastWarn,
+    }
+
+    setToastContext(context);
+  }
+
   const setAuthLevel = () => {
     auth.user ? buildAuthenticatedUser("user", auth.user) : buildAuthenticatedUser("guest", []);
+  }
+
+  const handleToastSuccess = (message: string) => {
+    toast.success(message);
+  }
+
+  const handleToastInfo = (message: string) => {
+    toast.info(message);
+  }
+
+  const handleToastError = (message: string) => {
+    toast.error(message);
+  }
+
+  const handleToastWarn = (message: string) => {
+    toast.warn(message);
   }
 
   const buildAuthenticatedUser = (authType: string, user: any) => {
@@ -85,12 +118,26 @@ const ReactApp: React.FC = ({ ...props }: any): JSX.Element => {
   return ((!loaded || !auth.isValidate || !cart.isInitializeCart) ? <SpinnerComponent /> :
     <BrowserRouter>
       <HelmetProvider>
+      <ToastContext.Provider value={toastContext!}>
         <AuthContext.Provider value={authenticatedUser!}>
           <ThemeContext.Provider value={theme}>
             <Routes auth={authLocale} />
           </ThemeContext.Provider>
         </AuthContext.Provider>
+        </ToastContext.Provider>
       </HelmetProvider>
+      <ToastContainer
+          theme="dark"
+          position='bottom-right'
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
     </BrowserRouter>
   );
 };

@@ -1,17 +1,17 @@
 import React from "react";
 
+import empty from "../utils/empty";
+
 export interface ProductMenuContextProvider{
-    fullscreen:Function | undefined;
-    addCart:Function | undefined;
-    addFavorites:Function | undefined;
-    toastCallback:Function | undefined;
+    fullscreen:Function;
+    addCart:Function;
+    addFavorites:Function;
 }
 
 const initialize:ProductMenuContextProvider = {
-    fullscreen:undefined,
-    addCart:undefined,
-    addFavorites:undefined,
-    toastCallback:undefined
+    fullscreen:empty,
+    addCart:empty,
+    addFavorites:empty,
 }
 
 const ProductMenuContext = React.createContext(initialize);

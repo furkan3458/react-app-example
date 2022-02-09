@@ -1,13 +1,16 @@
-import React,{useState, useContext} from 'react';
-import {Row, Col, Badge} from 'react-bootstrap';
+import React, { useState, useContext, useEffect } from 'react';
+import { Row, Col, Badge } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+
 import { StateType } from '../state/reducers';
+import { CartProductType } from '../state/reducers/cartReducer';
 
-import ShoppingCartAmountContext from '../contexts/ShoppingCartAmountContext';
 
+import ShoppingCartAmountContext, { AmountContextProdiver } from '../contexts/ShoppingCartAmountContext';
+import ToastContext, { ToastContextProvider } from '../contexts/ToastContext';
 
 interface ShoppingCartCellProps {
-    id:number,
+    id: number,
     title: string,
     secondText: string,
     image: string,
@@ -16,29 +19,69 @@ interface ShoppingCartCellProps {
 }
 
 const ShoppingCartCellComponent = ({ ...props }: ShoppingCartCellProps) => {
+    const [lastAmount, setLastAmount] = useState(props.amount);
+    const [isAmountClicked, setIsAmountClicked] = useState(false);
 
-    const context = useContext(ShoppingCartAmountContext);
+    const context = useContext<AmountContextProdiver>(ShoppingCartAmountContext);
+    const toastContext = useContext<ToastContextProvider>(ToastContext);
 
     const cart = useSelector((state: StateType) => state.cart);
 
+    useEffect(() => {
+        if (!cart.isCartLoading && isAmountClicked) {
+            setIsAmountClicked(false);
+            checkItemOnChart();
+        }
+    }, [cart.isCartLoading])
+
+
     const handleAmountDecrease = () => {
-        if(props.amount === 1 || cart.isCartLoading){
-            context.toast!("The amount of product cannot be less than one.");
+        if (props.amount === 1) {
+            toastContext.toastError("The amount of product cannot be less than one.");
             return;
         }
+        else if (cart.isCartLoading) {
+            toastContext.toastInfo("Please wait...");
+            return;
+        }
+
+        setLastAmount(getLastAmount());
+        setIsAmountClicked(true);
 
         context.decrease!(props.id);
     }
 
-    const handleAmountIncrease = () =>{
-        if(cart.isCartLoading)
+    const handleAmountIncrease = () => {
+        if (cart.isCartLoading) {
+            toastContext.toastInfo("Please wait...");
             return;
+        }
 
+        setLastAmount(getLastAmount());
+        setIsAmountClicked(true);
         context.increase!(props.id);
     }
 
-    const handleItemRemove = () =>{
+    const handleItemRemove = () => {
         context.remove!(props.id);
+    }
+
+    const getLastAmount = ():number => {
+        const cartProducts: CartProductType[] = cart.cartProducts;
+        const index = cartProducts.findIndex(value => { return value.id === props.id });
+
+        return index !== -1 ? cartProducts[index].amount : 0;
+    }
+
+    const checkItemOnChart = () => {
+        const cartProducts: CartProductType[] = cart.cartProducts;
+
+        const index = cartProducts.findIndex(value => { return value.id === props.id });
+
+        if (index !== -1 && lastAmount !== cartProducts[index].amount)
+            toastContext.toastSuccess("Product has successfully updated.");
+        else
+            toastContext.toastError("The product could not be added to your cart.");
     }
 
     return (
@@ -60,7 +103,7 @@ const ShoppingCartCellComponent = ({ ...props }: ShoppingCartCellProps) => {
                         </Col>
                         <Col>${props.price}</Col>
                         <div className="position-absolute end-0 w-auto">
-                            <span onClick={()=> handleItemRemove()} className="close">&#10005;</span>
+                            <span onClick={() => handleItemRemove()} className="close">&#10005;</span>
                         </div>
                     </Row>
                 </Row>

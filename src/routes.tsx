@@ -1,10 +1,10 @@
 import React from 'react';
 import { RouteObject, useRoutes } from 'react-router-dom';
 
-import Home from './Home';
-import Login from './Login';
-import Signup from './Signup';
-import Error from './Error';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Error from './pages/Error';
 
 interface RouteProps {
     auth: "guest" | "user" | string;

@@ -1,20 +1,21 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Col, Container, Row, Form, Button, Spinner } from 'react-bootstrap';
 import {Helmet} from "react-helmet-async";
 import { Link } from 'react-router-dom';
 import { useSelector, connect } from 'react-redux';
 import $ from 'jquery';
 
-import { StateType } from './state/reducers';
-import { setAuthLoading, setAuthFail, setAuthenticated, loadUser } from './state/actions/authActions';
+import { StateType } from '../state/reducers';
+import { setAuthLoading, setAuthFail, setAuthenticated, loadUser } from '../state/actions/authActions';
 
-import NavbarComponent from './components/NavbarComponent';
-import SpinnerComponent from './components/SpinnerComponent';
-import FooterComponent from './components/FooterComponent';
-import ToastComponent from './components/ToastComponent';
-import AlertComponent from './components/AlertComponent';
+import NavbarComponent from '../components/NavbarComponent';
+import SpinnerComponent from '../components/SpinnerComponent';
+import FooterComponent from '../components/FooterComponent';
+import AlertComponent from '../components/AlertComponent';
 
-export const Login = ({ ...props }: any) => {
+import ToastContext, { ToastContextProvider } from '../contexts/ToastContext';
+
+const Login = ({ ...props }: any) => {
 
     const [username, setusername] = useState("");
     const [password, setpassword] = useState("");
@@ -22,8 +23,8 @@ export const Login = ({ ...props }: any) => {
     const [loaded, setLoaded] = useState(false);
     const [usernameValid, setusernameValid] = useState(false);
     const [passwordValid, setpasswordValid] = useState(false);
-    const [toastShow, settoastShow] = useState(false);
-    const [toastMessage, settoastMessage] = useState("");
+
+    const toastContext = useContext<ToastContextProvider>(ToastContext);
 
     const passwordSpan = useRef<HTMLSpanElement>(null);
     const usernameInput = useRef<HTMLInputElement>(null);
@@ -65,22 +66,19 @@ export const Login = ({ ...props }: any) => {
     const onSubmitFormClick = (e: any) => {
         e.preventDefault();
         if (auth.isLoading) {
-            settoastMessage("Please wait...");
-            settoastShow(true);
+            toastContext.toastError("Please wait...");
             return;
         }
 
         if ((username === "" || !usernameValid) && usernameInput.current) {
             usernameInput.current.focus();
-            settoastMessage("Please Enter the valid username.");
-            settoastShow(true);
+            toastContext.toastError("Please enter valid username.");
             return;
         }
 
         else if ((password === "" || !passwordValid) && passwordInput.current) {
             passwordInput.current.focus();
-            settoastMessage("Please Enter the valid password.");
-            settoastShow(true);
+            toastContext.toastError("Please enter valid password.");
             return;
         }
 
@@ -140,11 +138,6 @@ export const Login = ({ ...props }: any) => {
         setpasswordValid(passwordValid);
     }
 
-    const toastCallback: Function = () => {
-        if (toastShow)
-            settoastShow(false);
-    }
-
     const handleSubmitAccess = () => {
         if (submitButton.current === null)
             return;
@@ -167,8 +160,6 @@ export const Login = ({ ...props }: any) => {
                 <meta charSet="utf-8" />
                 <title>Brand - Login</title>
             </Helmet>
-            <ToastComponent type={"Danger"} position={"top-end"} text={toastMessage}
-                show={toastShow} header={"Brand"} iconClass={"fa-solid fa-circle"} delay={5000} autohide={true} close={() => toastCallback()} />
             <NavbarComponent />
             <section className="ftco-section text-black">
                 <Container>

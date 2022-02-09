@@ -6,7 +6,9 @@ import { useTypedSelector } from '../state/reducers';
 
 import CldImageComponent from './CldImageComponent';
 
-import ProductMenuContext from '../contexts/ProductMenuContext';
+import ProductMenuContext, { ProductMenuContextProvider } from '../contexts/ProductMenuContext';
+import ToastContext, { ToastContextProvider } from '../contexts/ToastContext';
+
 import { CartProductType,CartState } from '../state/reducers/cartReducer';
 
 interface CardCellPropType {
@@ -22,7 +24,9 @@ interface CardCellPropType {
 
 const CardCellComponent = ({ ...props }: CardCellPropType): JSX.Element => {
 
-  const context = useContext(ProductMenuContext);
+  const context = useContext<ProductMenuContextProvider>(ProductMenuContext);
+  const toastContext = useContext<ToastContextProvider>(ToastContext);
+
   const cardRef = useRef<HTMLDivElement>(null);
   const [isAddingCart, setisAddingCart] = useState(false);
   const [addedCount, setAddedCount] = useState(0);
@@ -38,7 +42,7 @@ const CardCellComponent = ({ ...props }: CardCellPropType): JSX.Element => {
 
   const onShoppingChartClick = () => {
     if (cart.isCartLoading) {
-      context.toastCallback!("Please wait...");
+      toastContext.toastInfo("Please wait...");
       return;
     }
     const cartProducts: CartProductType[] = cart.cartProducts;
@@ -68,11 +72,11 @@ const CardCellComponent = ({ ...props }: CardCellPropType): JSX.Element => {
     const index = cartProducts.findIndex(value => { return value.id === props.id });
 
     if (index !== -1 && addedCount !== cartProducts[index].amount && cartProducts[index].amount === 1)
-      context.toastCallback!("Product has successfully added to your cart.");
+      toastContext.toastSuccess("Product has successfully added to your cart.");
     else if(index !== -1 && addedCount !== cartProducts[index].amount)
-      context.toastCallback!("Product has successfully updated.");
+    toastContext.toastSuccess("Product has successfully updated.");
     else
-      context.toastCallback!("The product could not be added to your cart.");
+    toastContext.toastError("The product could not be added to your cart.");
   }
 
   return (
