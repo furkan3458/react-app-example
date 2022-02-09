@@ -127,16 +127,15 @@ const ReactApp: React.FC = ({ ...props }: any): JSX.Element => {
         </ToastContext.Provider>
       </HelmetProvider>
       <ToastContainer
-          theme="dark"
+          theme="light"
           position='bottom-right'
-          autoClose={3000}
+          autoClose={1500}
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick
           rtl={false}
           pauseOnFocusLoss
           draggable
-          pauseOnHover
         />
     </BrowserRouter>
   );
